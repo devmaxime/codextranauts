@@ -6,6 +6,7 @@ Context-aware code assistant.
 
 - Project description: https://docs.google.com/document/d/1sW52jTz1u8JYyERZfIxBgnt8UI3VW8VAGdCSBqK3ssw/edit
 - Trello board: https://trello.com/b/v0vboA1o/pinecone-2023
+- Architecture doc : https://docs.google.com/presentation/d/1FmQDaLUFrAJuS73uY0iG9flT2f5z1ZZSOOSxMshvFDQ/
 
 ## About
 
