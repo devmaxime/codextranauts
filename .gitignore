@@ -1,0 +1,5 @@
+__pycache__
+.venv
+example_codebase
+.env
+langchain.ipynb

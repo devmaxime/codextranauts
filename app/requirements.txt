@@ -1,0 +1,7 @@
+langchain
+openai
+deeplake
+tiktoken 
+fastapi
+uvicorn
+python-dotenv
