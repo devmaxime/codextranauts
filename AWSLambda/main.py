@@ -38,5 +38,5 @@ def main():
     insert_vectors(index, [vector_id], [embedding_np])
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
