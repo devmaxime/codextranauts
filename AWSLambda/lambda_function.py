@@ -2,9 +2,15 @@ from main import main
 
 
 def lambda_handler(event, context):
-    main()
+    try:
+        main()
 
-    return {
-        'statusCode': 200,
-        'body': 'Lambda function executed successfully!'
-    }
+        return {
+            'statusCode': 200,
+            'body': 'Lambda function executed successfully!'
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': str(e)
+        }
