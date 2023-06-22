@@ -1,6 +1,5 @@
 import os
 import pinecone as pc
-import uuid
 
 from codeFetcher import fetch_script_text
 from pineconeUtils import insert_vectors
@@ -28,15 +27,15 @@ def main():
     embedding_vector = get_embedding_vector(code_test_text)
 
     # Flatten the embedding tensor
-    embedding_flat = embedding_vector.view(-1, embedding_vector.size(-1))
+    # embedding_flat = embedding_vector.view(-1, embedding_vector.size(-1))
 
     # Convert the embedding tensor to a NumPy array
-    embedding_np = embedding_flat.detach().numpy().tolist()
+    # embedding_np = embedding_flat.detach().numpy().tolist()
 
     vector_id = "A"
 
-    insert_vectors(index, [vector_id], [embedding_np])
+    insert_vectors(index, [vector_id], [embedding_vector])
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
