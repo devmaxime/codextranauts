@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Codextranauts",
+  "name_for_model": "codextranauts",
+  "description_for_human": "Connect ChatGPT to your GitHub and local codebase for ChatGPT to have context of your code.",
+  "description_for_model": "Help user with their code by requesting snippets of code relevant to user's question",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://api.bluecollarverse.co.uk/openapi.yaml"
+  },
+  "logo_url": "https://codextranauts.s3.amazonaws.com/logo.png",
+  "contact_email": "biryuchinskiy@gmail.com",
+  "legal_info_url": "https://api.bluecollarverse.co.uk/legal"
+}

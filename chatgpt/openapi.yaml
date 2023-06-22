@@ -1,0 +1,30 @@
+openapi: 3.0.1
+info:
+  title: Code Context Plugin
+  description: A plugin that allows the user to provide access to codebase while using ChatGPT.
+  version: "v1"
+servers:
+  - url: https://api.bluecollarverse.co.uk
+paths:
+  /name:
+    get:
+      operationId: getUser
+      summary: Tells you the name of the user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getNameResponse"
+components:
+  schemas:
+    getNameResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 200
+        body:
+          type: string
+          example: "User's name is Andrey."
