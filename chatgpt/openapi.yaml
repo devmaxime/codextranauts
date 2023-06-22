@@ -1,11 +1,28 @@
 openapi: 3.0.1
 info:
   title: Code Context Plugin
-  description: A plugin that allows the user to provide access to codebase while using ChatGPT.
+  description: A plugin that gives you information and code snippets from the codebase the user is working on.
   version: "v1"
 servers:
   - url: https://api.bluecollarverse.co.uk
 paths:
+  /code_context:
+    post:
+      operationId: getCodeContext
+      summary: Tells you about code the user has writen and is currently working on
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/getContextRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getContextResponse"
   /name:
     get:
       operationId: getUser
@@ -19,7 +36,16 @@ paths:
                 $ref: "#/components/schemas/getNameResponse"
 components:
   schemas:
-    getNameResponse:
+    getContextRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: User's question related about code or specific parts codebase.
+          required: true
+    getContextResponse:
       type: object
       properties:
         statusCode:
@@ -27,4 +53,13 @@ components:
           example: 200
         body:
           type: string
-          example: "User's name is Andrey."
+          example: "Code from user's codebase."
+  getNameResponse:
+    type: object
+    properties:
+      statusCode:
+        type: integer
+        example: 200
+      body:
+        type: string
+        example: "User's name is Andrey."
