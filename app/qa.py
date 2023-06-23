@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends
 import logging
+from importlib import import_module
 
 from config import settings
 from llm.openai import get_gpt_3_5_turbo_llm
-from agents.custom_agent import get_agent
+from agents.custom_agent import get_custom_agent
 from templates import template_1
 from tools.deeplake_codebase_tool import get_deeplake_codebase_tool
 
@@ -25,9 +26,15 @@ def get_agent_dependency():
 
     log.info("Initializing agent...")
     try:
-        template = template_1.template
+        # Get the template
+        template_module = import_module(f"templates.{settings.template_name}")
+        template = template_module.template
+
+        # Get the tools
         tools = [get_deeplake_codebase_tool()]
-        agent = get_agent(llm, template, tools)
+
+        # Get the agent
+        agent = get_custom_agent(llm, template, tools)
     except Exception as e:
         log.error(f"Could not initialize agent: {e}")
         raise e

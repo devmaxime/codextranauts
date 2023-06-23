@@ -5,3 +5,4 @@ tiktoken
 fastapi
 uvicorn
 python-dotenv
+pinecone-client

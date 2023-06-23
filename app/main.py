@@ -10,7 +10,7 @@ load_dotenv()
 def create_application() -> FastAPI:
     """
     Create a FastAPI application instance.
-    """
+    """ 
 
     application = FastAPI()
 

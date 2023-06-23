@@ -49,7 +49,7 @@ class CustomOutputParser(AgentOutputParser):
         # Return the action and action input
         return AgentAction(tool=action, tool_input=action_input.strip(" ").strip('"'), log=llm_output)
 
-def get_agent(llm: OpenAI,template: str, tools: List[Tool]):
+def get_custom_agent(llm: OpenAI,template: str, tools: List[Tool]):
     """
     Create a custom agent based on the template and tools provided.
     
