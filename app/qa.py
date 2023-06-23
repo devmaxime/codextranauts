@@ -5,8 +5,9 @@ from importlib import import_module
 from config import settings
 from llm.openai import get_gpt_3_5_turbo_llm
 from agents.custom_agent import get_custom_agent
-from templates import template_1
+
 from tools.deeplake_codebase_tool import get_deeplake_codebase_tool
+from tools.pinecone_codebase_tool import get_pinecone_codebase_tool
 
 router = APIRouter()
 log = logging.getLogger("uvicorn")
@@ -31,7 +32,13 @@ def get_agent_dependency():
         template = template_module.template
 
         # Get the tools
-        tools = [get_deeplake_codebase_tool()]
+        match settings.vector_db:
+            case "deeplake":
+                tools = [get_deeplake_codebase_tool()]
+            case "pinecone":
+                tools = [get_pinecone_codebase_tool()]
+            case _:
+                log.error(f"Unknown vector database: {settings.vector_db}")
 
         # Get the agent
         agent = get_custom_agent(llm, template, tools)
