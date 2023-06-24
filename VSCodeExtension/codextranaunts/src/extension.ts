@@ -5,23 +5,39 @@ import * as vscode from "vscode";
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  let disposable = vscode.commands.registerCommand(
-    "codextranaunts.showGitChanges",
-    async function () {
-      // The command has been defined in the package.json file
-      // Now we execute the command to show Git changes
-
+  // Use vscode.workspace.onDidSaveTextDocument event to trigger your function when any file in the workspace is saved.
+  context.subscriptions.push(
+    vscode.workspace.onDidSaveTextDocument(async () => {
       const vscodeGit = vscode.extensions.getExtension("vscode.git");
       const gitExtension = vscodeGit && vscodeGit.exports;
-      console.log(await gitExtension.getAPI(1).repositories[0].diff(true));
-      console.log(
-        await gitExtension.getAPI(1).repositories[0].diff(),
-        " this is diff"
-      );
-    }
-  );
+      const repo = await gitExtension.getAPI(1).repositories[0];
 
-  context.subscriptions.push(disposable);
+      const workingTreeChanges = repo.state.workingTreeChanges;
+      let customDiffWithUntrackedChanges = "";
+
+      const untrackedFiles = workingTreeChanges.filter(
+        (change: { status: number }) => {
+          if (change.status === 7) {
+            return true;
+          }
+        }
+      );
+
+      for (const file of untrackedFiles) {
+        vscode.workspace.fs
+          .readFile(file.a.resourceUri)
+          .then((fileData: Uint8Array) => {
+            customDiffWithUntrackedChanges += `${
+              file.a.resourceUri
+            }\n+ ${Buffer.from(fileData).toString()}\n`;
+          });
+      }
+
+      const trackedFilesDiff = await repo.diff();
+      customDiffWithUntrackedChanges += trackedFilesDiff;
+      console.log(customDiffWithUntrackedChanges);
+    })
+  );
 }
 
 // This method is called when your extension is deactivated
