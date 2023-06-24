@@ -1,8 +1,8 @@
 import os
 import pinecone as pc
 
-from codeFetcher import fetch_script_text
-from pineconeUtils import insert_vectors
+from code_fetcher import fetch_script_text
+from pinecone_utils import insert_vectors
 from vectorizer import get_embedding_vector
 
 pinecone_key = os.getenv("PINECONE_KEY")
