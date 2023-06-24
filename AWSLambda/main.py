@@ -5,15 +5,19 @@ from code_fetcher import fetch_script_text
 from pinecone_utils import insert_vectors
 from vectorizer import get_embedding_vector
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
+
+
 pinecone_key = os.getenv("PINECONE_KEY")
 pinecone_env = os.getenv("PINECONE_ENV")
 
+
 INDEX_NAME = "indexvectornauts1"
 
-pc.init(
-    api_key=pinecone_key,
-    environment=pinecone_env
-)
+pc.init(api_key=pinecone_key, environment=pinecone_env)
 
 code_example = "def max(a,b): if a>b: return a else return b"
 url_test = "https://raw.githubusercontent.com/devmaxime/codextranauts/AWSLambda/AWSLambda/vectorizer.py"
@@ -37,5 +41,5 @@ def main():
     insert_vectors(index, [vector_id], [embedding_vector])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

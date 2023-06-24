@@ -1,0 +1,4 @@
+requests
+astunparse
+transformers
+pinecone-client
