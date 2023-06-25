@@ -1,11 +1,39 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
+const axios = require("axios");
+const fs = require("fs");
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  // Use vscode.workspace.onDidSaveTextDocument event to trigger your function when any file in the workspace is saved.
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  let username: string;
+  let repository: string;
+
+  if (workspaceFolders) {
+    const workspaceFolder = workspaceFolders[0];
+
+    const packageJsonPath =
+      workspaceFolder.uri.fsPath + "/codextranauts-next/package.json";
+    fs.readFile(packageJsonPath, "utf8", (err, data) => {
+      if (err) {
+        console.log(err);
+        vscode.window.showErrorMessage("Failed to read package.json file.");
+        return;
+      }
+
+      try {
+        const packageJson = JSON.parse(data);
+        const properties = packageJson.contributes.configuration.properties;
+        username = properties["codextranaunts.githubUsername"].default;
+        repository = properties["codextranaunts.repository"].default;
+      } catch (error) {
+        vscode.window.showErrorMessage("Failed to parse package.json data.");
+      }
+    });
+  } else {
+    vscode.window.showErrorMessage("No workspace folder found.");
+  }
+
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument(async () => {
       const vscodeGit = vscode.extensions.getExtension("vscode.git");
@@ -35,10 +63,27 @@ export function activate(context: vscode.ExtensionContext) {
 
       const trackedFilesDiff = await repo.diff();
       customDiffWithUntrackedChanges += trackedFilesDiff;
-      console.log(customDiffWithUntrackedChanges);
+
+      const response = await axios.post(
+        "http://localhost:3000/api/LocalChanges",
+        {
+          username,
+          repository,
+          diff: customDiffWithUntrackedChanges.replace(/\0/g, ""),
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      const result = response.data;
+      console.log(result);
     })
   );
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
+module.exports = {
+  activate,
+};
