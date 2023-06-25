@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: AWSLambda",
+      "type": "python",
+      "request": "launch",
+      "module": "lambda_function.lambda_handler",
+      "cwd": "${workspaceFolder}/AWSLambda"
+    }
+  ]
+}

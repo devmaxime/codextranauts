@@ -21,8 +21,9 @@ def get_tokens_ids(tokens):
 #     context_embeddings = model.encode(text)
 #     return context_embeddings
 
+
 def get_embedding_vector(text):
-    feature_extractor = pipeline('feature-extraction', model=model, tokenizer=tokenizer)
+    feature_extractor = pipeline("feature-extraction", model=model, tokenizer=tokenizer)
 
     # Generate the embeddings
     embeddings = feature_extractor(text)
