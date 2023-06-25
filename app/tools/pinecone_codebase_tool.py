@@ -1,9 +1,9 @@
 from langchain.vectorstores import Pinecone
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.chains.question_answering import load_qa_chain
 from langchain.tools import Tool
-from langchain import OpenAI
+from langchain.chat_models import ChatOpenAI
 import pinecone
+from langchain.chains import ConversationalRetrievalChain
 
 def search_pinecone_codebase(question):
     """
@@ -26,21 +26,17 @@ def search_pinecone_codebase(question):
     index_name = "codebase-test"
     index = pinecone.Index(index_name=index_name)
 
-    # Define the vector store
-    vectorstore = Pinecone(
+    # Define the retriever
+    retriever = Pinecone(
         index,
         OpenAIEmbeddings().embed_query,
         "text"
-    )
+    ).as_retriever()
 
     # Define the chain
-    chain = load_qa_chain(OpenAI(temperature=0))
+    chain = ConversationalRetrievalChain.from_llm(ChatOpenAI(model_name="gpt-3.5-turbo"), retriever=retriever)
 
-    number_of_relevant_documents = 5 # You can play with this value.
-
-    docs = vectorstore.similarity_search(question, k=number_of_relevant_documents)
-
-    return docs
+    return chain({"question": question, "chat_history": []})["answer"]
 
 def get_pinecone_codebase_tool():
     """
