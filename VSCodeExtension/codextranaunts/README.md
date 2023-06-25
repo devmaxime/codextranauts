@@ -1,7 +1,3 @@
-# codextranaunts README
-
-This is the README for your extension "codextranaunts".
-
 ## Requirements
 
 Make sure to add this into your package.json and replace defaults with anything you'd like as this is MVP.
