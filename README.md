@@ -2,6 +2,30 @@
 
 Context-aware code assistant.
 
+## Config
+
+Make sure to add this to your project's package.json. Make sure to change default
+
+```
+"contributes": {
+    "configuration": {
+      "title": "Codextranaunts",
+      "properties": {
+        "codextranaunts.githubUsername": {
+          "type": "string",
+          "default": "",
+          "description": "Your GitHub username, this is purely used as an identifier for now, feel free to use anything"
+        },
+        "codextranaunts.repository": {
+          "type": "string",
+          "default": "",
+          "description": "Your GitHub repository, this is purely used as an identifier for now, feel free to use anything"
+        }
+      }
+    }
+  },
+```
+
 ## Links
 
 - Project description: https://docs.google.com/document/d/1sW52jTz1u8JYyERZfIxBgnt8UI3VW8VAGdCSBqK3ssw/edit

@@ -1,0 +1,25 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = "postgres://postgres:bF4ecUXQAjs9xKwY@db.qejdcwzeywvinjfvbpfk.supabase.co:6543/postgres?pgbouncer=true"
+  directUrl = "postgres://postgres:bF4ecUXQAjs9xKwY@db.qejdcwzeywvinjfvbpfk.supabase.co:5432/postgres"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  githubId     String        @unique
+  githubRepo   String        @unique
+  localChanges LocalChange[]
+}
+
+model LocalChange {
+  id        Int      @id @default(autoincrement())
+  user_id   Int      @unique
+  diff      String
+  timestamp DateTime @default(now())
+  user      User     @relation(fields: [user_id], references: [id])
+}

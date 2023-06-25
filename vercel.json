@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "./codextranauts-next",
+      "use": "@vercel/next"
+    }
+  ],
+  "rootDirectory": "./codextranauts-next"
+}
