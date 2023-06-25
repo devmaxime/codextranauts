@@ -1,10 +1,10 @@
 import os
 from langchain.embeddings import OpenAIEmbeddings
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 
 # Load environment variables from .env
-load_dotenv()
+# load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
