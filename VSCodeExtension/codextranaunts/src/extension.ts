@@ -1,5 +1,3 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 const axios = require("axios");
 const fs = require("fs");
@@ -14,22 +12,26 @@ export function activate(context: vscode.ExtensionContext) {
 
     const packageJsonPath =
       workspaceFolder.uri.fsPath + "/codextranauts-next/package.json";
-    fs.readFile(packageJsonPath, "utf8", (err, data) => {
-      if (err) {
-        console.log(err);
-        vscode.window.showErrorMessage("Failed to read package.json file.");
-        return;
-      }
+    fs.readFile(
+      packageJsonPath,
+      "utf8",
+      (err: NodeJS.ErrnoException | null, data: string) => {
+        if (err) {
+          console.log(err);
+          vscode.window.showErrorMessage("Failed to read package.json file.");
+          return;
+        }
 
-      try {
-        const packageJson = JSON.parse(data);
-        const properties = packageJson.contributes.configuration.properties;
-        username = properties["codextranaunts.githubUsername"].default;
-        repository = properties["codextranaunts.repository"].default;
-      } catch (error) {
-        vscode.window.showErrorMessage("Failed to parse package.json data.");
+        try {
+          const packageJson = JSON.parse(data);
+          const properties = packageJson.contributes.configuration.properties;
+          username = properties["codextranaunts.githubUsername"].default;
+          repository = properties["codextranaunts.repository"].default;
+        } catch (error) {
+          vscode.window.showErrorMessage("Failed to parse package.json data.");
+        }
       }
-    });
+    );
   } else {
     vscode.window.showErrorMessage("No workspace folder found.");
   }
@@ -82,7 +84,6 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
 module.exports = {
   activate,
