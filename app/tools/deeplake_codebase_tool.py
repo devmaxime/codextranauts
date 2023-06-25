@@ -37,7 +37,7 @@ def get_deeplake_codebase_tool():
     search_codebase_tool = Tool.from_function(
         func=search_deeplake_codebase,
         name="Search Codebase",
-        description="Search the codebase for answers to your questions."
+        description="Search the codebase for answers to your question."
     )
 
     return search_codebase_tool

@@ -9,7 +9,7 @@ log = logging.getLogger("uvicorn")
 
 class Settings(BaseSettings):
     environment: str = "dev"
-    vector_db: str = "deeplake"
+    vector_db: str = "pinecone"
     llm_model_name: str = "gpt-3.5-turbo"
     template_name: str = "template_2"
 
