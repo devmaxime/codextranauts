@@ -14,23 +14,6 @@
   ],
   "type": "commonjs",
   "main": "./out/extension.js",
-  "contributes": {
-    "configuration": {
-      "title": "Codextranaunts",
-      "properties": {
-        "codextranaunts.githubUsername": {
-          "type": "string",
-          "default": "MSKTest",
-          "description": "Your GitHub username, this is purely used as an identifier for now, feel free to use anything"
-        },
-        "codextranaunts.repository": {
-          "type": "string",
-          "default": "TestRepository",
-          "description": "Your GitHub repository, this is purely used as an identifier for now, feel free to use anything"
-        }
-      }
-    }
-  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
