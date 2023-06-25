@@ -2,3 +2,4 @@ requests
 astunparse
 transformers
 pinecone-client
+langchain
