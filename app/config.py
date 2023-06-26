@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     environment: str = "dev"
     vector_db: str = "pinecone"
     llm_model_name: str = "gpt-3.5-turbo"
-    template_name: str = "template_2"
+    template_name: str = "template_3"
 
 
 @lru_cache()

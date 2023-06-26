@@ -18,7 +18,6 @@ def search_pinecone_codebase(question):
     
     # Initialize Pinecone
     pinecone.init(
-        api_key="797c1452-d615-40b6-bc63-56bba3fca7db",
         environment="asia-southeast1-gcp-free"
     )
 

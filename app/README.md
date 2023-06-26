@@ -52,3 +52,12 @@ It is recommended to create a new template file when you want to modify the temp
 ## Deploy
 
 You can deploy the app in any server. We recommend using Docker. You can find a Dockerfile and a Dockerfile.prod in the root directory of the project.
+
+## Examples
+
+You can find examples of how the output will look like below:
+
+```\n\"context\": {\n    \"codebase\": \"This codebase is designed to detect and remove text from images using various text detection methods.\",\n    \"configuration\": \"The project uses Python 3.9 and OpenCV 4.5.1. It also utilizes the EasyOCR library for text detection.\",\n    \"related_code_snippets\": [\n        \"def fill_text_boxes(image: np.ndarray, boxes: List[Boxe]) -> np.ndarray:\\n    for box in boxes:\\n        x1, y1, x2, y2 = box.get_box_coords()\\n        image[y1:y2, x1:x2] = (0, 0, 0)\\n    return image\",\n        \"def detect_text_boxes_easyocr(image: np.ndarray) -> Boxes:\\n    reader = easyocr.Reader(['en'])\\n    results = reader.detect(image)\\n    boxes = []\\n    for result in results:\\n        box = result[0]\\n        boxes.append(Boxe(x=box[0], y=box[1], width=box[2]-box[0], height=box[3]-box[1]))\\n    return Boxes(box_list=boxes)\"\n    ],\n    \"constraining_code_snippets\": [\n        \"class Boxes(BaseModel):\\n    box_list: List[Boxe]\\n\\n    class Config:\\n        arbitrary_types_allowed = True\",\n        \"class Boxe(BaseModel):\\n    x: int\\n    y: int\\n    width: int\\n    height: int\\n\\n    def get_box_coords(self) -> Tuple[int, int, int, int]:\\n        return (self.x, self.y, self.x + self.width, self.y + self.height)\\n\\n    class Config:\\n        arbitrary_types_allowed = True\",\n        \"class AdvancedBoxes(BaseModel):\\n    box_list: List[AdvancedBoxe]\\n\\n    class Config:\\n        arbitrary_types_allowed = True\",\n        \"class AdvancedBoxe(BaseModel):\\n    x: float\\n    y: float\\n    w: float\\n    h: float\\n    prob: float\\n\\n    def get_box_coords(self) -> Tuple[float, float, float, float]:\\n        return (self.x, self.y, self.x + self.w, self.y + self.h)\\n\\n    class Config:\\n        arbitrary_types_allowed = True\"\n    ],\n    \"factors\": []\n}\n```
+
+
+```
