@@ -4,3 +4,15 @@ example_codebase
 .env
 langchain.ipynb
 commands
+
+# VS code settings
+.vscode
+
+**/.DS_Store
+
+# ignoring zipped lambdas and layers
+*layer.zip
+*lambda.zip
+
+# AWS SAM
+.aws-sam

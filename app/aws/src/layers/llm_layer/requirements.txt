@@ -1,0 +1,6 @@
+uvicorn
+python-dotenv
+langchain
+openai
+tiktoken
+pinecone-client
