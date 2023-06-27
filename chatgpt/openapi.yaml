@@ -9,7 +9,7 @@ paths:
   /code_context:
     post:
       operationId: getCodeContext
-      summary: Tells you about code the user has writen and is currently working on
+      summary: Tells you about code the user has written and is currently working on
       requestBody:
         required: true
         content:
@@ -23,6 +23,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/getContextResponse"
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
   /name:
     get:
       operationId: getUser
@@ -34,6 +38,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/getNameResponse"
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
 components:
   schemas:
     getContextRequest:
@@ -43,23 +51,16 @@ components:
       properties:
         query:
           type: string
-          description: User's question related about code or specific parts codebase.
-          required: true
+          description: User's question related to code or specific parts of the codebase.
     getContextResponse:
       type: object
       properties:
-        statusCode:
-          type: integer
-          example: 200
         body:
           type: string
-          example: "Code from user's codebase."
-  getNameResponse:
-    type: object
-    properties:
-      statusCode:
-        type: integer
-        example: 200
-      body:
-        type: string
-        example: "User's name is Andrey."
+          description: Code from the user's codebase.
+    getNameResponse:
+      type: object
+      properties:
+        body:
+          type: string
+          description: User's name.
