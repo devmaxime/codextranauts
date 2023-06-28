@@ -5,3 +5,7 @@
 # Ignore Python virtual environment
 venv/
 __pycache__/
+.env
+.vscode
+
+.aws-sam

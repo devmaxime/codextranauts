@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+
+Description: AWS SAM Template for VectorizeCodebase Lambda function
+
+Resources:
+  VectorizeCodebaseLambda:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: src/lambdas/vectorize_codebase_lambda
+      Handler: lambda_function.handler
+      Runtime: python3.9
+      Timeout: 300
+      Environment:
+        Variables:
+          OPENAI_API_KEY: !Sub "{{resolve:ssm:/OPENAI_API_KEY:1}}"
+          PINECONE_ENV: !Sub "{{resolve:ssm:/PINECONE_ENV:1}}"
+          PINECONE_API_KEY: !Sub "{{resolve:ssm:/PINECONE_API_KEY:1}}"
+          PINECONE_INDEX_NAME: !Sub "{{resolve:ssm:/PINECONE_INDEX_NAME:1}}"
+      Layers:
+        - !Ref DependenciesLayer
+        - !Ref SharedCodeLayer
+
+  # Layers
+  DependenciesLayer:
+    Type: "AWS::Serverless::LayerVersion"
+    Properties:
+      LayerName: codextranauts-vectorize-codebase-dependencies-layer
+      ContentUri: src/layers/dependencies_layer
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
+  SharedCodeLayer:
+    Type: "AWS::Serverless::LayerVersion"
+    Properties:
+      LayerName: codextranauts-vectorize-shared-code-layer
+      ContentUri: src/layers/shared_code_layer
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9

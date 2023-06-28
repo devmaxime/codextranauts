@@ -9,6 +9,7 @@ pinecone_env = os.getenv("PINECONE_ENV")
 
 index_name = "test-pinecone-index"  # "indexvectornauts1"
 pc.init(api_key=pinecone_key, environment=pinecone_env)
+
 index = pc.Index(index_name=index_name)
 
 
