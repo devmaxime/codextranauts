@@ -8,15 +8,16 @@ Resources:
     Type: "AWS::Serverless::Function"
     Properties:
       CodeUri: src/lambdas/vectorize_codebase_lambda
-      Handler: lambda_function.handler
+      Handler: lambda_function.lambda_handler
       Runtime: python3.9
-      Timeout: 300
+      Timeout: 600
+      MemorySize: 512
       Environment:
         Variables:
           OPENAI_API_KEY: !Sub "{{resolve:ssm:/OPENAI_API_KEY:1}}"
           PINECONE_ENV: !Sub "{{resolve:ssm:/PINECONE_ENV:1}}"
-          PINECONE_API_KEY: !Sub "{{resolve:ssm:/PINECONE_API_KEY:1}}"
-          PINECONE_INDEX_NAME: !Sub "{{resolve:ssm:/PINECONE_INDEX_NAME:1}}"
+          PINECONE_API_KEY: !Sub "{{resolve:ssm:/PINECONE_API_KEY:2}}"
+          PINECONE_INDEX_NAME: !Sub "{{resolve:ssm:/PINECONE_INDEX_NAME:2}}"
       Layers:
         - !Ref DependenciesLayer
         - !Ref SharedCodeLayer

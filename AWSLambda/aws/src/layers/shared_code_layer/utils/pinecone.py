@@ -51,7 +51,9 @@ class PineconeIndex:
                     dimension=self.dimension,
                     metric="cosine",
                 )
-                self.logger.info(f"Index '{self.index_name}' created successfully.")
+                self.logger.info(
+                    f"Index '{self.index_name}' created successfully."
+                )
 
             self._index = pc.Index(index_name=self.index_name)
         except pc.errors.IndexAlreadyExistsError:
@@ -65,7 +67,7 @@ class PineconeIndex:
             self.logger.error(f"An unexpected error occurred: {e}")
             raise
 
-    def upsert_vectors(self, texts: List[str]):
+    def upsert_vectors(self, texts: List[str], metadata):
         """
         Upserts a list of text strings to the Pinecone index.
 
@@ -81,22 +83,30 @@ class PineconeIndex:
         """
 
         # Validate inputs
-        if not texts or not all(isinstance(text, str) for text in texts):
-            raise ValueError("texts must be a non-empty list of strings.")
+        # if not texts or not all(isinstance(text, str) for text in texts):
+        #     raise ValueError("texts must be a non-empty list of strings.")
+
+        vectors = []
+
+        embeddings = get_docs_embeddings(texts)
+        print("embeddings len:", len(embeddings))
 
         try:
-            vectors = [
-                (str(i), get_docs_embeddings(text)[0], {"text": text})
-                for i, text in enumerate(texts, start=1)
-            ]
+            for i, text in enumerate(texts):
+                id = metadata[i]["name"]
+                embedding = embeddings[i]
+                vector_metadata: dict = metadata[i]
+                vector_metadata["text"] = text
+                vector = (id, embedding, vector_metadata)
+                vectors.append(vector)
+
             self.index.upsert(vectors)
             self.logger.info(f"Upsert successful for {len(vectors)} vectors.")
-        except pc.errors.UpsertError as e:
-            self.logger.error(f"Upsert failed for vectors: {vectors}")
-            self.logger.exception(e)
-            raise
         except Exception as e:
-            self.logger.error("Unexpected error occurred during upsert operation.")
+            self.logger.error(
+                "Unexpected error occurred during upsert operation.",
+                exc_info=True
+            )
             self.logger.exception(e)
             raise
 
@@ -148,7 +158,3 @@ class PineconeIndex:
             )
             self.logger.exception(e)
             raise
-
-
-# index_name = os.getenv("PINECONE_INDEX_NAME")
-# index = PineconeIndex(index_name=index_name)

@@ -15,7 +15,9 @@ def initialize_embeddings():
         openai_api_key = os.getenv("OPENAI_API_KEY")
         if not openai_api_key:
             logger.critical("OPENAI_API_KEY not set in environment variables.")
-            raise ValueError("OPENAI_API_KEY not set in environment variables.")
+            raise ValueError(
+                "OPENAI_API_KEY not set in environment variables."
+            )
         embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
         return embeddings
     except Exception as e:
@@ -33,7 +35,8 @@ def get_docs_embeddings(docs: List[str]) -> Optional[List[float]]:
         docs: List of documents as strings.
 
     Returns:
-        List of embeddings for each document in the input list or None if an error occurs.
+        List of embeddings for each document in the input list or None if
+        an error occurs.
     """
     try:
         return embeddings.embed_documents(docs)
