@@ -1,3 +1,4 @@
+import os
 import ast
 import astunparse
 import logging
@@ -8,6 +9,12 @@ import requests
 
 # Create a logger
 logger = logging.getLogger(__name__)
+
+github_api_key = os.getenv("GITHUB_API_KEY")
+
+headers = {
+    'Authorization': f"token {github_api_key}",
+}
 
 
 def get_all_files(
@@ -49,6 +56,7 @@ def _get_all_files_recursive(
     """
     if path is None:
         path = ""
+
     url = f"https://api.github.com/repos/{user}/{repo}/contents/{path}"
 
     for attempt in range(5):  # Retry up to 5 times
@@ -84,7 +92,7 @@ def _get_contents_from_url(
         List of contents, or None if request fails
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
 
         # Check if the response has JSON content
@@ -140,7 +148,7 @@ def fetch_code_text(download_url: str) -> Optional[str]:
         logs error if a RequestException occurs during the request.
     """
     try:
-        response = requests.get(download_url)
+        response = requests.get(download_url, headers=headers)
         response.raise_for_status()
         return response.text
     except RequestException as e:
