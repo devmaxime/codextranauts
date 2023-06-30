@@ -13,14 +13,22 @@ logger = logging.getLogger(__name__)
 github_api_key = os.getenv("GITHUB_API_KEY")
 
 headers = {
-    'Authorization': f"token {github_api_key}",
+    # "Authorization": f"token {github_api_key}",
 }
 
 
+def is_python_file(file):
+    # get the filename from the file dictionary
+    filename = file["name"]
+    # check if the filename ends with .py (python extension)
+    if filename.endswith(".py"):
+        return True
+    else:
+        return False
+
+
 def get_all_files(
-        user: str,
-        repo: str,
-        path: Optional[str] = None
+    user: str, repo: str, path: Optional[str] = None
 ) -> List[Dict[str, Union[str, int]]]:
     """
     Get all files in a GitHub repository
@@ -39,10 +47,10 @@ def get_all_files(
 
 
 def _get_all_files_recursive(
-        user: str,
-        repo: str,
-        path: Optional[str],
-        file_list: List[Dict[str, Union[str, int]]]
+    user: str,
+    repo: str,
+    path: Optional[str],
+    file_list: List[Dict[str, Union[str, int]]],
 ) -> None:
     """
     Recursive function to explore all directories in a GitHub repository and
@@ -66,22 +74,22 @@ def _get_all_files_recursive(
                 break
         except RequestException as e:
             logger.error(f"Failed to get file list: {str(e)}", exc_info=True)
-            time.sleep(2 ** attempt)  # Exponential backoff
+            time.sleep(2**attempt)  # Exponential backoff
             continue
 
     if contents is None:  # If still None after retries, return
         return
 
     for file in contents:
-        if file['type'] == 'dir':
-            _get_all_files_recursive(user, repo, file['path'], file_list)
+        if file["type"] == "dir":
+            _get_all_files_recursive(user, repo, file["path"], file_list)
         else:
-            file_list.append(file)
+            # check if it's a python file
+            if is_python_file(file):
+                file_list.append(file)
 
 
-def _get_contents_from_url(
-        url: str
-) -> Optional[List[Dict[str, Union[str, int]]]]:
+def _get_contents_from_url(url: str) -> Optional[List[Dict[str, Union[str, int]]]]:
     """
     Get contents from a URL
 
@@ -96,7 +104,7 @@ def _get_contents_from_url(
         response.raise_for_status()
 
         # Check if the response has JSON content
-        if 'application/json' in response.headers['Content-Type']:
+        if "application/json" in response.headers["Content-Type"]:
             return response.json()
         else:
             logger.error(f"URL did not return a JSON response: {url}")

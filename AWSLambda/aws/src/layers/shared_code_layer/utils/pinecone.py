@@ -55,9 +55,7 @@ class PineconeIndex:
                     dimension=self.dimension,
                     metric="cosine",
                 )
-                self.logger.info(
-                    f"Index '{self.index_name}' created successfully."
-                )
+                self.logger.info(f"Index '{self.index_name}' created successfully.")
 
             self._index = pc.Index(index_name=self.index_name)
         except pc.errors.IndexAlreadyExistsError:
@@ -113,8 +111,7 @@ class PineconeIndex:
             self.logger.info(f"Upsert successful for {len(vectors)} vectors.")
         except Exception as e:
             self.logger.error(
-                "Unexpected error occurred during upsert operation.",
-                exc_info=True
+                "Unexpected error occurred during upsert operation.", exc_info=True
             )
             self.logger.exception(e)
             raise
@@ -150,8 +147,7 @@ class PineconeIndex:
             self.logger.info("Upsert successful for vector.")
         except Exception as e:
             self.logger.error(
-                "Unexpected error occurred during upsert operation.",
-                exc_info=True
+                "Unexpected error occurred during upsert operation.", exc_info=True
             )
             self.logger.exception(e)
 
@@ -238,6 +234,20 @@ class PineconeIndex:
         except Exception as e:
             self.logger.error(
                 f"Unexpected error: {str(e)} occurred during query operation."
+            )
+            self.logger.exception(e)
+            raise
+
+    def delete_all(self):
+        """
+        Delete all vectors from the Pinecone index.
+        """
+
+        try:
+            self.index.delete(delete_all=True)
+        except Exception as e:
+            self.logger.error(
+                f"Unexpected error: {str(e)} occurred during deleting all vectors from index."
             )
             self.logger.exception(e)
             raise
