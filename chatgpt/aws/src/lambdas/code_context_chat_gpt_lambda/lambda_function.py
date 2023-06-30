@@ -1,29 +1,85 @@
 import json
 import requests
+import logging
+from requests.exceptions import HTTPError, Timeout, RequestException
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+# API URL defined as an environment variable
+API_URL = "https://api.bluecollarverse.co.uk/ccp"
+API_TIMEOUT = 800
+
+# Create a session object to reuse underlying TCP connections
+session = requests.Session()
+
+
+def validate_event(event):
+    """
+    Validate the incoming event for necessary information
+    """
+    query_params = event.get("queryStringParameters", {})
+    if "query" not in query_params:
+        raise ValueError("Query parameter 'query' not provided in the event")
+    return query_params["query"]
+
+
+def make_request(url, params):
+    """
+    Make a GET request to the given URL with the given parameters.
+    """
+    try:
+        response = session.get(url, params=params)
+        response.raise_for_status()
+        return response.text
+    except HTTPError as err:
+        logging.error(f"HTTP error occurred: {err}")
+        raise
+    except Timeout as err:
+        logging.error(f"Timeout occurred: {err}")
+        raise
+    except RequestException as err:
+        logging.error(f"Request failed: {err}")
+        raise
 
 
 def lambda_handler(event, context):
-    # Get the 'query' from the body
-    query = event["query"]
-
-    if query is None:
+    # Validate incoming event
+    try:
+        query = validate_event(event)
+    except ValueError as err:
+        logging.error(f"Invalid event: {err}")
         return {
             "statusCode": 400,
-            "body": json.dumps({"error": "No query provided"}),
+            "body": json.dumps({"error": str(err)}),
         }
 
-    # Define the URL and query parameters for the API request
-    url = "https://codextranauts-c8f0a4d4554f.herokuapp.com/qa"
+    # Make request
     params = {"question": query}
-
     try:
-        # Make the POST request
-        response = requests.post(url, params=params)
-        response.raise_for_status()
+        response_text = make_request(API_URL, params)
+    except HTTPError:
+        logging.error("Service unavailable or request rejected")
+        return {
+            "statusCode": 503,
+            "body": json.dumps(
+                {
+                    "error": "Service unavailable or request rejected",
+                }
+            ),
+        }
+    except Timeout:
+        logging.error("Request to service timed out")
+        return {
+            "statusCode": 504,
+            "body": json.dumps({"error": "Request to service timed out"}),
+        }
+    except RequestException as err:
+        logging.error(f"Unexpected error: {err}")
+        return {
+            "statusCode": 500,
+            "body": json.dumps({"error": str(err)}),
+        }
 
-    except requests.exceptions.RequestException as err:
-        return {"statusCode": 500, "body": json.dumps({"error": str(err)})}
-
-    else:
-        # Return the response body as the result of the Lambda function
-        return {"statusCode": 200, "body": {"code": response.text}}
+    # Return successful response
+    return {"statusCode": 200, "body": json.dumps({"code": response_text})}
