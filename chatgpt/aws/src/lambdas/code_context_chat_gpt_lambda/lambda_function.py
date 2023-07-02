@@ -8,7 +8,6 @@ logging.basicConfig(level=logging.INFO)
 
 # API URL defined as an environment variable
 API_URL = "https://api.bluecollarverse.co.uk/ccp"
-API_TIMEOUT = 800
 
 # Create a session object to reuse underlying TCP connections
 session = requests.Session()
