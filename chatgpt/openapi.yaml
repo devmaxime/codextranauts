@@ -1,0 +1,72 @@
+openapi: 3.0.1
+info:
+  title: Code Context Plugin
+  description: A plugin that gives you information and code snippets from the codebase the user is working on.
+  version: "v1"
+servers:
+  - url: https://api.bluecollarverse.co.uk
+paths:
+  /code_context:
+    get:
+      operationId: getCodeContext
+      summary: Tells you about code the user has written and is currently working on
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+          description: User's original question related to their codebase. Pass the question without modifying it.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Code"
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+  /team:
+    get:
+      operationId: getTeam
+      summary: Tells you the team who made this plugin, gives their names and GitHub usernames.
+      responses:
+        "200":
+          description: Team information response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamInfo"
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+components:
+  schemas:
+    Code:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "function example() { return true; }"
+    TeamInfo:
+      type: object
+      properties:
+        team_name:
+          type: string
+          example: "Codextranauts"
+        team_members:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamMember"
+    TeamMember:
+      type: object
+      properties:
+        github:
+          type: string
+          example: "front-end-guy-2020"
+        first_name:
+          type: string
+          example: "Andrey"

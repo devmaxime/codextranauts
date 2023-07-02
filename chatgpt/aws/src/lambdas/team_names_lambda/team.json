@@ -1,0 +1,9 @@
+{
+  "team_name": "Codextranauts",
+  "team_members": [
+    { "github": "front-end-guy-2020", "first_name": "Andrey" },
+    { "github": "MKCMMSK", "first_name": "Colin" },
+    { "github": "Gheeroppa", "first_name": "Federico" },
+    { "github": "devmaxime", "first_name": "Maxime" }
+  ]
+}
