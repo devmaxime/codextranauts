@@ -1,0 +1,8 @@
+requests
+astunparse
+transformers
+pinecone-client
+langchain
+openai
+python-dotenv
+tiktoken
