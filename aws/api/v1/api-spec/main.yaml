@@ -1,0 +1,18 @@
+openapi: 3.0.1
+info:
+  title: Codextranauts API
+  description: Main API for Codextranauts ChatGPT plugin
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://api.bluecollarverse.co.uk/v1/
+paths:
+  /hello:
+    $ref: "paths/hello.yaml"
+  /bye:
+    $ref: "paths/bye.yaml"
+# components:
+# securitySchemes:
+#   $ref: "components/securitySchemes.yaml"

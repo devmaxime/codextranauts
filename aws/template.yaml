@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Specification template describing APIs.
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: Domain name to be used for the API.
+    Default: api.bluecollarverse.co.uk
+
+Resources:
+  MyCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      ValidationMethod: DNS
+
+  MyApiDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Ref DomainName
+      CertificateArn: !Ref MyCertificate
+      RegionalCertificateArn: !Ref MyCertificate
+
+  # API stacks for different versions
+  ApiV1Stack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./api/v1/template.yaml
+      Parameters:
+        MyApiDomain: !Ref MyApiDomain
+
+Outputs:
+  MyApiDomainOutput:
+    Description: "Custom domain name"
+    Value: !Ref MyApiDomain
