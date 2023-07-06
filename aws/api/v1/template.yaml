@@ -25,7 +25,7 @@ Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/lambdas/hello-world/
+      CodeUri: src/lambdas/hello_world/
       Handler: app.lambda_handler
       Runtime: python3.9
       Events:
@@ -39,7 +39,7 @@ Resources:
   ByeWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/lambdas/bye-world/
+      CodeUri: src/lambdas/bye_world/
       Handler: app.lambda_handler
       Runtime: python3.9
       Events:

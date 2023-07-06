@@ -1,0 +1,4 @@
+moto
+boto3
+openapi_spec_validator
+requests
