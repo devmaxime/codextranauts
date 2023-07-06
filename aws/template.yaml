@@ -1,28 +1,42 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: An AWS Serverless Specification template describing APIs.
+Description: An AWS Serverless Specification template describing infra for APIs and their documentation (using S3-hosted Swagger UI).
 
 Parameters:
-  DomainName:
+  ApiDomainName:
     Type: String
     Description: Domain name to be used for the API.
     Default: api.bluecollarverse.co.uk
+  DocsDomainName:
+    Type: String
+    Description: Domain name to be used for the docs.
+    Default: docs.bluecollarverse.co.uk
+  DocsBucketName:
+    Type: String
+    Description: Bucket name to be used for hosting API docs.
+    Default: codextranauts-docs
 
 Resources:
-  MyCertificate:
+  # Certificates
+  MyApiCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName: !Ref DomainName
+      DomainName: !Ref ApiDomainName
+      ValidationMethod: DNS
+  MyDocsCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DocsDomainName
       ValidationMethod: DNS
 
+  # Custom domains
   MyApiDomain:
     Type: AWS::ApiGateway::DomainName
     Properties:
-      DomainName: !Ref DomainName
-      CertificateArn: !Ref MyCertificate
-      RegionalCertificateArn: !Ref MyCertificate
+      DomainName: !Ref ApiDomainName
+      CertificateArn: !Ref MyApiCertificate
 
-  # API stacks for different versions
+  # API stacks
   ApiV1Stack:
     Type: AWS::Serverless::Application
     Properties:
@@ -30,7 +44,68 @@ Resources:
       Parameters:
         MyApiDomain: !Ref MyApiDomain
 
+  # S3 buckets
+  MyDocsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DocsBucketName
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    DependsOn:
+      - MyDocsBucket
+    Properties:
+      Bucket: !Ref MyDocsBucket
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub "arn:aws:s3:::${MyDocsBucket}/*"
+            Principal:
+              CanonicalUser: !GetAtt MyCloudFrontDistributionIdentity.S3CanonicalUserId
+
+  # CloudFront distributions
+  MyCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref DocsDomainName
+        Origins:
+          - DomainName: !GetAtt MyDocsBucket.DomainName
+            Id: MyS3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${MyCloudFrontDistributionIdentity}
+        Enabled: true
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: MyS3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+          AllowedMethods:
+            - HEAD
+            - GET
+        ViewerCertificate:
+          AcmCertificateArn: !Ref MyDocsCertificate
+          SslSupportMethod: sni-only
+
+  MyCloudFrontDistributionIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: Access identity for MyDocsBucket
+
 Outputs:
   MyApiDomainOutput:
-    Description: "Custom domain name"
+    Description: Custom API domain name
     Value: !Ref MyApiDomain
+  MyCloudFrontDistributionOutput:
+    Description: CloudFront endpoint to add in DNS CNAME record
+    Value: !GetAtt MyCloudFrontDistribution.DomainName

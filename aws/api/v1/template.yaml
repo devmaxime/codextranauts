@@ -6,8 +6,6 @@ Parameters:
   MyApiDomain:
     Type: String
     Description: The custom domain name
-    AllowedPattern: "(?!-)[a-zA-Z0-9-.]{1,63}(?<!-)"
-    ConstraintDescription: Must be a valid domain name
 
 Globals:
   Function:
@@ -23,18 +21,11 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: ./api-spec/bundled.yaml
-  MyApiBasePathMapping:
-    Type: AWS::ApiGateway::BasePathMapping
-    Properties:
-      BasePath: "v1"
-      DomainName: !Ref MyApiDomain
-      RestApiId: !Ref MainApi
-      Stage: Prod
 
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/hello-world/
+      CodeUri: src/lambdas/hello-world/
       Handler: app.lambda_handler
       Runtime: python3.9
       Events:
@@ -48,7 +39,7 @@ Resources:
   ByeWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/bye-world/
+      CodeUri: src/lambdas/bye-world/
       Handler: app.lambda_handler
       Runtime: python3.9
       Events:
@@ -59,6 +50,15 @@ Resources:
             Method: get
             RestApiId:
               Ref: MainApi
+
+  # API mappings
+  MyApiBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: v1
+      DomainName: !Ref MyApiDomain
+      RestApiId: !Ref MainApi
+      Stage: Prod
 
 Outputs:
   MyRestApi:
