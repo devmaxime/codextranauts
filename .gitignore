@@ -6,3 +6,4 @@ example_codebase
 langchain.ipynb
 commands
 .aws-sam
+.pytest_cache

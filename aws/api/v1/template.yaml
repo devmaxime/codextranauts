@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: An API Gateway with a custom domain.
 
 Parameters:
-  MyApiDomain:
+  ApiDomain:
     Type: String
     Description: The custom domain name
 
@@ -12,6 +12,7 @@ Globals:
     Timeout: 3
 
 Resources:
+  # API gateway
   MainApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -22,6 +23,23 @@ Resources:
           Parameters:
             Location: ./api-spec/bundled.yaml
 
+  MainApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: [HelloWorldFunction, ByeWorldFunction]
+    Properties:
+      RestApiId: !Ref MainApi
+      Description: Deployment for Main API
+
+  # MainApiProdStage:
+  #   Type: AWS::ApiGateway::Stage
+  #   DependsOn: MainApiDeployment
+  #   Properties:
+  #     StageName: Prod
+  #     Description: Production stage
+  #     RestApiId: !Ref MainApi
+  #     DeploymentId: !Ref MainApiDeployment
+
+  # Lambdas
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -52,15 +70,16 @@ Resources:
               Ref: MainApi
 
   # API mappings
-  MyApiBasePathMapping:
+  MainApiBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
+    DependsOn:
+      - MainApiDeployment
     Properties:
       BasePath: v1
-      DomainName: !Ref MyApiDomain
+      DomainName: !Ref ApiDomain
       RestApiId: !Ref MainApi
       Stage: Prod
-
-Outputs:
-  MyRestApi:
-    Description: "API Gateway endpoint URL for Prod environment"
-    Value: !Sub "https://${MainApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+# Outputs:
+#   MainApiOutput:
+#     Description: "API Gateway endpoint URL for Prod environment"
+#     Value: !Sub "https://${MainApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"

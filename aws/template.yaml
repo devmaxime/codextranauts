@@ -18,34 +18,28 @@ Parameters:
 
 Resources:
   # Certificates
-  MyApiCertificate:
+  ApiCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Ref ApiDomainName
       ValidationMethod: DNS
-  MyDocsCertificate:
+  DocsCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Ref DocsDomainName
       ValidationMethod: DNS
 
   # Custom domains
-  MyApiDomain:
+  ApiDomain:
     Type: AWS::ApiGateway::DomainName
+    DependsOn:
+      - ApiCertificate
     Properties:
       DomainName: !Ref ApiDomainName
-      CertificateArn: !Ref MyApiCertificate
-
-  # API stacks
-  ApiV1Stack:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: ./api/v1/template.yaml
-      Parameters:
-        MyApiDomain: !Ref MyApiDomain
+      CertificateArn: !Ref ApiCertificate
 
   # S3 buckets
-  MyDocsBucket:
+  DocsBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref DocsBucketName
@@ -53,33 +47,44 @@ Resources:
         IndexDocument: index.html
         ErrorDocument: error.html
 
-  BucketPolicy:
+  DocsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     DeletionPolicy: Retain
     DependsOn:
-      - MyDocsBucket
+      - DocsBucket
+      - DocsCloudFrontDistributionIdentity
     Properties:
-      Bucket: !Ref MyDocsBucket
+      Bucket: !Ref DocsBucket
       PolicyDocument:
         Statement:
           - Action: s3:GetObject
             Effect: Allow
-            Resource: !Sub "arn:aws:s3:::${MyDocsBucket}/*"
+            Resource: !Sub "arn:aws:s3:::${DocsBucket}/*"
             Principal:
-              CanonicalUser: !GetAtt MyCloudFrontDistributionIdentity.S3CanonicalUserId
+              CanonicalUser: !GetAtt DocsCloudFrontDistributionIdentity.S3CanonicalUserId
 
   # CloudFront distributions
-  MyCloudFrontDistribution:
+  DocsCloudFrontDistributionIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: Access identity for DocsBucket
+
+  DocsCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - DocsCloudFrontDistributionIdentity
+      - DocsBucket
+      - DocsCertificate
     Properties:
       DistributionConfig:
         Aliases:
           - !Ref DocsDomainName
         Origins:
-          - DomainName: !GetAtt MyDocsBucket.DomainName
+          - DomainName: !GetAtt DocsBucket.DomainName
             Id: MyS3Origin
             S3OriginConfig:
-              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${MyCloudFrontDistributionIdentity}
+              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${DocsCloudFrontDistributionIdentity}
         Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
@@ -93,19 +98,23 @@ Resources:
             - HEAD
             - GET
         ViewerCertificate:
-          AcmCertificateArn: !Ref MyDocsCertificate
+          AcmCertificateArn: !Ref DocsCertificate
           SslSupportMethod: sni-only
 
-  MyCloudFrontDistributionIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+  # API stacks
+  ApiV1Stack:
+    Type: AWS::Serverless::Application
+    DependsOn:
+      - ApiDomain
     Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: Access identity for MyDocsBucket
+      Location: ./api/v1/template.yaml
+      Parameters:
+        ApiDomain: !Ref ApiDomain
 
 Outputs:
-  MyApiDomainOutput:
+  ApiDomainOutput:
     Description: Custom API domain name
-    Value: !Ref MyApiDomain
-  MyCloudFrontDistributionOutput:
+    Value: !Ref ApiDomain
+  CloudFrontDistributionOutput:
     Description: CloudFront endpoint to add in DNS CNAME record
-    Value: !GetAtt MyCloudFrontDistribution.DomainName
+    Value: !GetAtt DocsCloudFrontDistribution.DomainName
