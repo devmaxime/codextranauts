@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Specification template describing your function.
+
+Globals:
+  Function:
+    Timeout: 300
+
+Resources:
+  #Lambda
+  CodeContextProviderLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambdas/code_context_provider/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      Layers:
+        - !Ref LlmLayer
+        - !Ref HelpersLayer
+        - !Ref SharedCodeLayer
+      Environment:
+        Variables:
+          PINECONE_API_KEY: !Sub "{{resolve:ssm:PINECONE_API_KEY:2}}"
+          PINECONE_ENV: !Sub "{{resolve:ssm:PINECONE_ENV:1}}"
+          PINECONE_INDEX_NAME: !Sub "{{resolve:ssm:PINECONE_INDEX_NAME:2}}"
+          OPENAI_API_KEY: !Sub "{{resolve:ssm:OPENAI_API_KEY:1}}"
+
+  # Lambda Layers
+  HelpersLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: helpers-layer
+      Description: helpers packages for my functions
+      ContentUri: src/layers/helpers_layer/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
+
+  SharedCodeLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: shared-code-layer
+      Description: shared code for my functions
+      ContentUri: src/layers/shared_code_layer/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
+
+  LlmLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: llm-layer
+      Description: llm packages for my functions
+      ContentUri: src/layers/llm_layer/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
