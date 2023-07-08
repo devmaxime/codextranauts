@@ -9,23 +9,25 @@ ENDPOINT = "/code_context"
 @pytest.mark.integration
 def test_code_context_success():
     query = "How to write a function in Python?"
-    response = requests.get(f"{API_GATEWAY_URL}${ENDPOINT}?question={query}")
+    response = requests.get(f"{API_GATEWAY_URL}{ENDPOINT}?query={query}")
+
+    print(response)
 
     assert response.status_code == 200
 
     response_json = response.json()
-    assert 'code' in response_json
+    assert "code" in response_json
 
 
 @pytest.mark.integration
 def test_code_context_bad_request():
     query = ""  # Empty query, which should trigger a bad request
-    response = requests.get(f"{API_GATEWAY_URL}${ENDPOINT}/code_context?question={query}")
+    response = requests.get(f"{API_GATEWAY_URL}{ENDPOINT}?query={query}")
 
     assert response.status_code == 400
 
     response_json = response.json()
-    assert 'error' in response_json
+    assert "error" in response_json
 
 
 @pytest.mark.integration
@@ -38,12 +40,12 @@ def test_integration_internal_error():
     with requests_mock.Mocker() as m:
         query = "How to write a function in a non-existent programming language?"
         m.get(
-            f"{API_GATEWAY_URL}${ENDPOINT}/code_context?question={query}",
+            f"{API_GATEWAY_URL}{ENDPOINT}/code_context?query={query}",
             status_code=500,
-            json={"error": "An unexpected error occurred"}
+            json={"error": "An unexpected error occurred"},
         )
         response = requests.get(
-            f"{API_GATEWAY_URL}${ENDPOINT}/code_context?question={query}"
+            f"{API_GATEWAY_URL}{ENDPOINT}/code_context?query={query}"
         )
 
         assert response.status_code == 500
@@ -60,12 +62,12 @@ def test_integration_service_unavailable():
     with requests_mock.Mocker() as m:
         query = "How to write a function in a non-existent programming language?"
         m.get(
-            f"{API_GATEWAY_URL}${ENDPOINT}/code_context?question={query}",
+            f"{API_GATEWAY_URL}{ENDPOINT}/code_context?query={query}",
             status_code=503,
-            json={"error": "Service unavailable"}
+            json={"error": "Service unavailable"},
         )
         response = requests.get(
-            f"{API_GATEWAY_URL}${ENDPOINT}/code_context?question={query}"
+            f"{API_GATEWAY_URL}{ENDPOINT}/code_context?query={query}"
         )
 
         assert response.status_code == 503
@@ -82,12 +84,12 @@ def test_integration_service_timeout():
     with requests_mock.Mocker() as m:
         query = "How to write a function in a non-existent programming language?"
         m.get(
-            f"{API_GATEWAY_URL}${ENDPOINT}/code_context?question={query}",
+            f"{API_GATEWAY_URL}{ENDPOINT}/code_context?query={query}",
             status_code=504,
-            json={"error": "Request to service timed out"}
+            json={"error": "Request to service timed out"},
         )
         response = requests.get(
-            f"{API_GATEWAY_URL}${ENDPOINT}/code_context?question={query}"
+            f"{API_GATEWAY_URL}{ENDPOINT}/code_context?query={query}"
         )
 
         assert response.status_code == 504

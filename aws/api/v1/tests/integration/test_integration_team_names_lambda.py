@@ -9,7 +9,7 @@ API_GATEWAY_URL = "https://api.bluecollarverse.co.uk/v1"
 def api_response():
     """Fixture to make a GET request to the /team endpoint and yield the
     response."""
-    response = requests.get(API_GATEWAY_URL + '/team')
+    response = requests.get(API_GATEWAY_URL + "/team")
     yield response
 
 
@@ -31,7 +31,9 @@ def test_integration_success(api_response):
     assert response_data["team_members"], "team_members is empty"
     assert isinstance(response_data["team_members"], list), "team_members is not a list"
 
-    assert len(response_data["team_members"]) >= 1, "No team members found in the response"
+    assert (
+        len(response_data["team_members"]) >= 1
+    ), "No team members found in the response"
 
     for member in response_data["team_members"]:
         assert "github" in member, "github is not in the team member's data"
@@ -47,11 +49,11 @@ def test_integration_internal_error():
     """
     with requests_mock.Mocker() as m:
         m.get(
-            API_GATEWAY_URL + '/team',
+            API_GATEWAY_URL + "/team",
             status_code=500,
-            json={"error": "An unexpected error occurred"}
+            json={"error": "An unexpected error occurred"},
         )
-        response = requests.get(API_GATEWAY_URL + '/team')
+        response = requests.get(API_GATEWAY_URL + "/team")
         assert response.status_code == 500
         assert response.json() == {"error": "An unexpected error occurred"}
 
@@ -65,11 +67,11 @@ def test_integration_service_unavailable():
     """
     with requests_mock.Mocker() as m:
         m.get(
-            API_GATEWAY_URL + '/team',
+            API_GATEWAY_URL + "/team",
             status_code=503,
-            json={"error": "Service unavailable"}
+            json={"error": "Service unavailable"},
         )
-        response = requests.get(API_GATEWAY_URL + '/team')
+        response = requests.get(API_GATEWAY_URL + "/team")
 
         assert response.status_code == 503
         assert response.json() == {"error": "Service unavailable"}

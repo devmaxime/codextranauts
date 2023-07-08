@@ -6,7 +6,7 @@ get:
   operationId: getCodeContext
   parameters:
     - in: query
-      name: question
+      name: query
       schema:
         type: string
       required: true

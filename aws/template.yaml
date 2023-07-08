@@ -101,6 +101,12 @@ Resources:
           AcmCertificateArn: !Ref DocsCertificate
           SslSupportMethod: sni-only
 
+  # LLM stacks
+  LlmStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./llm/template.yaml
+
   # API stacks
   ApiV1Stack:
     Type: AWS::Serverless::Application
@@ -110,6 +116,7 @@ Resources:
       Location: ./api/v1/template.yaml
       Parameters:
         ApiDomain: !Ref ApiDomain
+        LlmFunctionArn: !GetAtt LlmStack.Outputs.LlmFunctionArn
 
 Outputs:
   ApiDomainOutput:

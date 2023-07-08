@@ -6,6 +6,9 @@ Parameters:
   ApiDomain:
     Type: String
     Description: The custom domain name
+  LlmFunctionArn:
+    Type: String
+    Description: The ARN of the LLM function
 
 Globals:
   Function:
@@ -50,6 +53,9 @@ Resources:
       CodeUri: src/lambdas/code_context_chat_gpt_lambda/
       Handler: app.lambda_handler
       Runtime: python3.9
+      Environment:
+        Variables:
+          LLM_LAMBDA_ARN: !Ref LlmFunctionArn
       Events:
         HelloWorld:
           Type: Api
@@ -58,6 +64,15 @@ Resources:
             Method: get
             RestApiId:
               Ref: MainApi
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource:
+                - !Ref LlmFunctionArn
   TeamFunction:
     Type: AWS::Serverless::Function
     Properties:

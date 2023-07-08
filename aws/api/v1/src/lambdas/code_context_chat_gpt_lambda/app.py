@@ -1,16 +1,42 @@
+import os
 import json
-import requests
 import logging
-from requests.exceptions import HTTPError, Timeout, RequestException
+import boto3
+from botocore.exceptions import BotoCoreError, ClientError
+from http import HTTPStatus
+from functools import wraps
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# API URL defined as an environment variable
-API_URL = "todo_lambda_endpoint"
+# Get env vars
+LLM_LAMBDA_ARN = os.getenv('LLM_LAMBDA_ARN')
 
-# Create a session object to reuse underlying TCP connections
-session = requests.Session()
+if not LLM_LAMBDA_ARN:
+    raise ValueError("Missing environment variable: LLM_LAMBDA_ARN")
+
+
+lambda_client = boto3.client('lambda')
+
+
+def error_handler(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError as err:
+            return {
+                "statusCode": HTTPStatus.BAD_REQUEST,
+                "body": json.dumps({"error": str(err)}),
+            }
+        except (BotoCoreError, ClientError) as err:
+            logger.error(f"Error calling Lambda function: {str(err)}")
+            return {
+                "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
+                "body": json.dumps({"error": str(err)}),
+            }
+    return wrapper
 
 
 def validate_event(event):
@@ -19,65 +45,38 @@ def validate_event(event):
     """
     query_params = event.get("queryStringParameters", {})
     if "query" not in query_params:
-        raise ValueError(
-            "Query parameter 'query' not provided in the event"
-        )
+        logger.error('Missing "query" in queryStringParameters.')
+        raise ValueError("Query parameter 'query' not provided in the event")
 
     query = query_params.get("query")
-
-    # Check if query is an empty string
-    if query.strip() == "":
-        raise ValueError(
-            "Query parameter 'query' should not be an empty string"
-        )
+    if not query.strip():
+        logger.error('"query" parameter is empty.')
+        raise ValueError("Query parameter 'query' should not be an empty string")
 
     return query
 
 
-def make_llm_request(url, params):
-    """
-    Make a GET request to the given URL with the given parameters.
-    """
-    return "llm response"
+def make_llm_request(params):
+    try:
+        invoke_response = lambda_client.invoke(
+            FunctionName=LLM_LAMBDA_ARN,
+            InvocationType='RequestResponse',
+            Payload=json.dumps(params)
+        )
+    except (BotoCoreError, ClientError) as error:
+        logger.error(f"Error calling Lambda function: {str(error)}")
+        raise error
+
+    payload = json.loads(invoke_response['Payload'].read().decode('utf-8'))
+    return payload
 
 
+@error_handler
 def lambda_handler(event, context):
-    # Validate incoming event
-    try:
-        query = validate_event(event)
-    except ValueError as err:
-        logging.error(f"Invalid event: {err}")
-        return {
-            "statusCode": 400,
-            "body": json.dumps({"error": str(err)}),
-        }
-
-    # Make request
+    query = validate_event(event)
     params = {"question": query}
-    try:
-        response_text = make_llm_request(API_URL, params)
-    except HTTPError:
-        logging.error("Service unavailable or request rejected")
-        return {
-            "statusCode": 503,
-            "body": json.dumps(
-                {
-                    "error": "Service unavailable or request rejected",
-                }
-            ),
-        }
-    except Timeout:
-        logging.error("Request to service timed out")
-        return {
-            "statusCode": 504,
-            "body": json.dumps({"error": "Request to service timed out"}),
-        }
-    except RequestException as err:
-        logging.error(f"Unexpected error: {err}")
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"error": str(err)}),
-        }
-
-    # Return successful response
-    return {"statusCode": 200, "body": json.dumps({"code": response_text})}
+    response_text = make_llm_request(params)
+    return {
+        "statusCode": HTTPStatus.OK,
+        "body": json.dumps({"code": response_text})
+    }
