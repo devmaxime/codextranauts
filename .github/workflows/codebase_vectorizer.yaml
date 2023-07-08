@@ -1,0 +1,53 @@
+name: Codebase vectorizer
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Name"
+        required: true
+        default: "devmaxime"
+      repo:
+        description: "GitHub repository"
+        required: true
+        default: "codextranauts"
+
+jobs:
+  invoke_lambda:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install awscli boto3
+
+      - name: Add project root to PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+
+      - name: Extract stack outputs for lambda ARNs
+        run: |
+          echo $(python ./utils/ci/extract_stack_outputs.py) > temp.txt
+          echo LLM_LAMBDA_ARN=$(awk '{print $1}' temp.txt) >> $GITHUB_ENV
+          echo CODEBASE_VECTORIZER_LAMBDA_ARN=$(awk '{print $2}' temp.txt) >> $GITHUB_ENV
+
+      - name: Invoke Lambda function
+        env:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "us-east-1"
+        run: |
+          echo '{"name":"${{ github.event.inputs.name }}", "repo":"${{ github.event.inputs.repo }}"}' > payload.json
+          aws lambda invoke --function-name ${{ env.CODEBASE_VECTORIZER_LAMBDA_ARN }} --payload file://payload.json response.json
+          cat response.json

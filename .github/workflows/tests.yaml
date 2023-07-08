@@ -17,6 +17,12 @@ jobs:
       - name: Add project root to PYTHONPATH
         run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
 
+      - name: Extract stack outputs for lambda ARNs
+        run: |
+          echo $(python ./utils/ci/extract_stack_outputs.py) > temp.txt
+          echo LLM_LAMBDA_ARN=$(awk '{print $1}' temp.txt) >> $GITHUB_ENV
+          echo CODEBASE_VECTORIZER_LAMBDA_ARN=$(awk '{print $2}' temp.txt) >> $GITHUB_ENV
+
       - name: Aggregate requirements and install dependencies
         run: |
           chmod +x aggregate_requirements.sh
@@ -35,8 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r all_requirements.txt
 
-      # - name: Run unit tests
-      #   env:
-      #     LLM_LAMBDA_ARN: ${{ secrets.LLM_LAMBDA_ARN }}
-      #   run: |
-      #     pytest -m unit
+      - name: Run unit tests
+        run: |
+          export LLM_LAMBDA_ARN=${{ env.LLM_LAMBDA_ARN }}
+          pytest -m unit

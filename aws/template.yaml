@@ -131,3 +131,9 @@ Outputs:
   CloudFrontDistributionOutput:
     Description: CloudFront endpoint to add in DNS CNAME record
     Value: !GetAtt DocsCloudFrontDistribution.DomainName
+  LlmLambdaOutput:
+    Description: LLM lambda arn
+    Value: !GetAtt LlmStack.Outputs.LlmFunctionArn
+  CodebaseVectorizerLambdaOutput:
+    Description: Codebase Vectorizer lambda arn
+    Value: !GetAtt CodebaseVectorizerStack.Outputs.CodebaseVectorizerFunctionArn
