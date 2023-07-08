@@ -36,5 +36,7 @@ jobs:
           pip install -r all_requirements.txt
 
       - name: Test with pytest
+        env:
+          LLM_LAMBDA_ARN: ${{ secrets.LLM_LAMBDA_ARN }}
         run: |
           pytest
