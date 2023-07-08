@@ -1,0 +1,22 @@
+type: object
+description: The team object
+required:
+  - team_name
+  - team_members
+properties:
+  team_name:
+    type: string
+    description: The name of the team
+    minLength: 1
+    maxLength: 200
+    example: "Data Engineering Team"
+  team_members:
+    type: array
+    description: List of team members
+    minItems: 1
+    items:
+      $ref: "../schemas/teamMember.yaml"
+    example:
+      - github: "johnDoe123"
+        first_name: "John"
+additionalProperties: false

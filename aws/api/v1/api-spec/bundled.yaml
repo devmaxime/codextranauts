@@ -7,111 +7,178 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
 servers:
-  - url: https://api.bluecollarverse.co.uk/v1/
+  - url: https://api.bluecollarverse.co.uk/v1
 paths:
-  /hello:
+  /code_context:
     get:
-      summary: Retrieve a greeting message
-      description: >-
-        This endpoint returns a friendly greeting message to the user. No input
-        parameters are required.
-      operationId: getHello
       tags:
-        - greeting
+        - code context
+      summary: Fetches code context based on the query
+      description: >-
+        Returns a code context based on the user's query. If there's an error in
+        the query or while interacting with the external service, it returns an
+        error object.
+      operationId: getCodeContext
+      parameters:
+        - in: query
+          name: question
+          schema:
+            type: string
+          required: true
+          description: The user's query.
       responses:
-        "200":
-          description: >-
-            Operation was successful. A greeting message is returned in the
-            response body.
+        '200':
+          description: Code context retrieved successfully.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HelloResponse"
-              examples:
-                example-1:
-                  value:
-                    message: Hello, World!
-        "400":
-          description: Bad Request. The request is malformed or invalid.
-        "401":
-          description: Unauthorized. The request lacks valid authentication credentials.
-        "403":
-          description: >-
-            Forbidden. The server understood the request but refuses to
-            authorize it.
-        "404":
-          description: Not Found. The requested resource could not be found on this server.
-        "500":
-          description: >-
-            Internal Server Error. The server encountered an unexpected
-            condition which prevented it from fulfilling the request.
+                $ref: '#/components/schemas/codeResponse'
+        '400':
+          description: Bad Request, usually due to invalid event data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '500':
+          description: An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '503':
+          description: External service unavailable or request rejected.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '504':
+          description: Request to external service timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
       x-amazon-apigateway-integration:
         httpMethod: POST
         type: aws_proxy
         uri:
           Fn::Sub: >-
-            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HelloWorldFunction.Arn}/invocations
-  /bye:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CodeContextFunction.Arn}/invocations
+  /team:
     get:
-      summary: Retrieve a greeting message
-      description: >-
-        This endpoint returns a friendly greeting message to the user. No input
-        parameters are required.
-      operationId: getBye
       tags:
-        - greeting
+        - Team
+      summary: Fetches team data
+      operationId: getTeamData
+      description: >-
+        This endpoint retrieves the team's data. It returns a JSON object that
+        contains the team's details.
       responses:
-        "200":
-          description: >-
-            Operation was successful. A greeting message is returned in the
-            response body.
+        '200':
+          description: Team data retrieved successfully.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GoodbyeResponse"
-              examples:
-                example-1:
-                  value:
-                    message: Bye, World!
-        "400":
-          description: Bad Request. The request is malformed or invalid.
-        "401":
-          description: Unauthorized. The request lacks valid authentication credentials.
-        "403":
-          description: >-
-            Forbidden. The server understood the request but refuses to
-            authorize it.
-        "404":
-          description: Not Found. The requested resource could not be found on this server.
-        "500":
-          description: >-
-            Internal Server Error. The server encountered an unexpected
-            condition which prevented it from fulfilling the request.
+                $ref: '#/components/schemas/teamData'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '500':
+          description: An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '503':
+          description: Team data not available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
       x-amazon-apigateway-integration:
         httpMethod: POST
         type: aws_proxy
         uri:
           Fn::Sub: >-
-            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ByeWorldFunction.Arn}/invocations
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeamFunction.Arn}/invocations
 components:
   schemas:
-    HelloResponse:
+    codeResponse:
       type: object
+      title: CodeResponse
+      description: >-
+        An object containing the code context returned by the external service.
+        This code context is a response to the user's query.
       properties:
-        message:
+        code:
           type: string
-          description: A friendly greeting message. The maximum length is 200 characters.
-          example: Hello, World!
-          maxLength: 200
+          description: >-
+            The code context string returned by the external service. This
+            string contains the relevant code snippet or reference related to
+            the user's query.
+          example: 'def hello_world(): print(''Hello, World!'')'
       required:
-        - message
-    GoodbyeResponse:
+        - code
+    error:
       type: object
-      properties:
-        message:
-          type: string
-          description: A friendly greeting message. The maximum length is 200 characters.
-          example: Goodbye, World!
-          maxLength: 200
+      description: Object representing an error.
       required:
-        - message
+        - error
+      properties:
+        error:
+          type: string
+          description: A human-readable message providing more details about the error.
+        code:
+          type: integer
+          description: A numerical identifier unique to this particular error type.
+          example: 503
+        detail:
+          type: string
+          description: A more detailed explanation of the error, if available.
+        path:
+          type: string
+          description: The path of the HTTP request during which the error occurred.
+    teamMember:
+      title: Team Member
+      type: object
+      description: The object that encapsulates the details of a team member.
+      additionalProperties: false
+      properties:
+        github:
+          type: string
+          description: The unique GitHub username of the team member.
+          pattern: ^[a-zA-Z0-9\-]+$
+          minLength: 1
+          maxLength: 39
+          example: front-end-guy-2020
+        first_name:
+          type: string
+          description: The first name of the team member.
+          minLength: 1
+          maxLength: 50
+          example: Andrey
+    teamData:
+      type: object
+      description: The team object
+      required:
+        - team_name
+        - team_members
+      properties:
+        team_name:
+          type: string
+          description: The name of the team
+          minLength: 1
+          maxLength: 200
+          example: Data Engineering Team
+        team_members:
+          type: array
+          description: List of team members
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/teamMember'
+          example:
+            - github: johnDoe123
+              first_name: John
+      additionalProperties: false

@@ -1,0 +1,18 @@
+type: object
+description: Object representing an error.
+required:
+  - error
+properties:
+  error:
+    type: string
+    description: A human-readable message providing more details about the error.
+  code:
+    type: integer
+    description: A numerical identifier unique to this particular error type.
+    example: 503
+  detail:
+    type: string
+    description: A more detailed explanation of the error, if available.
+  path:
+    type: string
+    description: The path of the HTTP request during which the error occurred.

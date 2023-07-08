@@ -1,0 +1,36 @@
+get:
+  tags:
+    - Team
+  summary: Fetches team data
+  operationId: getTeamData
+  description: This endpoint retrieves the team's data. It returns a JSON object that contains the team's details.
+  responses:
+    "200":
+      description: Team data retrieved successfully.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/teamData.yaml"
+    "400":
+      description: Bad request.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yaml"
+    "503":
+      description: Team data not available.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yaml"
+    "500":
+      description: An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yaml"
+  x-amazon-apigateway-integration:
+    httpMethod: POST
+    type: aws_proxy
+    uri:
+      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeamFunction.Arn}/invocations

@@ -25,49 +25,12 @@ Resources:
 
   MainApiDeployment:
     Type: AWS::ApiGateway::Deployment
-    DependsOn: [HelloWorldFunction, ByeWorldFunction]
+    DependsOn:
+      - CodeContextFunction
+      - TeamFunction
     Properties:
       RestApiId: !Ref MainApi
       Description: Deployment for Main API
-
-  # MainApiProdStage:
-  #   Type: AWS::ApiGateway::Stage
-  #   DependsOn: MainApiDeployment
-  #   Properties:
-  #     StageName: Prod
-  #     Description: Production stage
-  #     RestApiId: !Ref MainApi
-  #     DeploymentId: !Ref MainApiDeployment
-
-  # Lambdas
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/lambdas/hello_world/
-      Handler: app.lambda_handler
-      Runtime: python3.9
-      Events:
-        HelloWorld:
-          Type: Api
-          Properties:
-            Path: /hello
-            Method: get
-            RestApiId:
-              Ref: MainApi
-  ByeWorldFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/lambdas/bye_world/
-      Handler: app.lambda_handler
-      Runtime: python3.9
-      Events:
-        ByeWorld:
-          Type: Api
-          Properties:
-            Path: /bye
-            Method: get
-            RestApiId:
-              Ref: MainApi
 
   # API mappings
   MainApiBasePathMapping:
@@ -79,6 +42,36 @@ Resources:
       DomainName: !Ref ApiDomain
       RestApiId: !Ref MainApi
       Stage: Prod
+
+  # Lambdas
+  CodeContextFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambdas/code_context_chat_gpt_lambda/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /code_context
+            Method: get
+            RestApiId:
+              Ref: MainApi
+  TeamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambdas/team_names_lambda/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Events:
+        ByeWorld:
+          Type: Api
+          Properties:
+            Path: /team
+            Method: get
+            RestApiId:
+              Ref: MainApi
 # Outputs:
 #   MainApiOutput:
 #     Description: "API Gateway endpoint URL for Prod environment"

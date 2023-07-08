@@ -1,0 +1,18 @@
+title: Team Member
+type: object
+description: The object that encapsulates the details of a team member.
+additionalProperties: false
+properties:
+  github:
+    type: string
+    description: The unique GitHub username of the team member.
+    pattern: '^[a-zA-Z0-9\-]+$'
+    minLength: 1
+    maxLength: 39 # GitHub username restrictions
+    example: "front-end-guy-2020"
+  first_name:
+    type: string
+    description: The first name of the team member.
+    minLength: 1
+    maxLength: 50
+    example: "Andrey"

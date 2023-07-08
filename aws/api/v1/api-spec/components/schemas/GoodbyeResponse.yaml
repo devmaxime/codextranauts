@@ -1,9 +1,0 @@
-type: object
-properties:
-  message:
-    type: string
-    description: A friendly greeting message. The maximum length is 200 characters.
-    example: "Goodbye, World!"
-    maxLength: 200
-required:
-  - message

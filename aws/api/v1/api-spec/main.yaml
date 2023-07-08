@@ -7,12 +7,12 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
 servers:
-  - url: https://api.bluecollarverse.co.uk/v1/
+  - url: https://api.bluecollarverse.co.uk/v1
 paths:
-  /hello:
-    $ref: "paths/hello.yaml"
-  /bye:
-    $ref: "paths/bye.yaml"
+  /code_context:
+    $ref: "paths/code_context.yaml"
+  /team:
+    $ref: "paths/team.yaml"
 # components:
 # securitySchemes:
 #   $ref: "components/securitySchemes.yaml"

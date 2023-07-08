@@ -1,0 +1,49 @@
+get:
+  tags:
+    - code context
+  summary: Fetches code context based on the query
+  description: Returns a code context based on the user's query. If there's an error in the query or while interacting with the external service, it returns an error object.
+  operationId: getCodeContext
+  parameters:
+    - in: query
+      name: question
+      schema:
+        type: string
+      required: true
+      description: The user's query.
+  responses:
+    "200":
+      description: Code context retrieved successfully.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/codeResponse.yaml"
+    "400":
+      description: Bad Request, usually due to invalid event data.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yaml"
+    "503":
+      description: External service unavailable or request rejected.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yaml"
+    "504":
+      description: Request to external service timed out.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yaml"
+    "500":
+      description: An unexpected error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yaml"
+  x-amazon-apigateway-integration:
+    httpMethod: POST
+    type: aws_proxy
+    uri:
+      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CodeContextFunction.Arn}/invocations

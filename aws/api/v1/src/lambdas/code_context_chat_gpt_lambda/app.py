@@ -7,7 +7,7 @@ from requests.exceptions import HTTPError, Timeout, RequestException
 logging.basicConfig(level=logging.INFO)
 
 # API URL defined as an environment variable
-API_URL = "https://api.bluecollarverse.co.uk/ccp"
+API_URL = "todo_lambda_endpoint"
 
 # Create a session object to reuse underlying TCP connections
 session = requests.Session()
@@ -19,27 +19,26 @@ def validate_event(event):
     """
     query_params = event.get("queryStringParameters", {})
     if "query" not in query_params:
-        raise ValueError("Query parameter 'query' not provided in the event")
-    return query_params["query"]
+        raise ValueError(
+            "Query parameter 'query' not provided in the event"
+        )
+
+    query = query_params.get("query")
+
+    # Check if query is an empty string
+    if query.strip() == "":
+        raise ValueError(
+            "Query parameter 'query' should not be an empty string"
+        )
+
+    return query
 
 
-def make_request(url, params):
+def make_llm_request(url, params):
     """
     Make a GET request to the given URL with the given parameters.
     """
-    try:
-        response = session.get(url, params=params)
-        response.raise_for_status()
-        return response.text
-    except HTTPError as err:
-        logging.error(f"HTTP error occurred: {err}")
-        raise
-    except Timeout as err:
-        logging.error(f"Timeout occurred: {err}")
-        raise
-    except RequestException as err:
-        logging.error(f"Request failed: {err}")
-        raise
+    return "llm response"
 
 
 def lambda_handler(event, context):
@@ -56,7 +55,7 @@ def lambda_handler(event, context):
     # Make request
     params = {"question": query}
     try:
-        response_text = make_request(API_URL, params)
+        response_text = make_llm_request(API_URL, params)
     except HTTPError:
         logging.error("Service unavailable or request rejected")
         return {

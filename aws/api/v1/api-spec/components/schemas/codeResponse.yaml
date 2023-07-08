@@ -1,0 +1,10 @@
+type: object
+title: CodeResponse
+description: "An object containing the code context returned by the external service. This code context is a response to the user's query."
+properties:
+  code:
+    type: string
+    description: "The code context string returned by the external service. This string contains the relevant code snippet or reference related to the user's query."
+    example: "def hello_world(): print('Hello, World!')"
+required:
+  - code
