@@ -42,6 +42,7 @@ jobs:
           pip install -r all_requirements.txt
 
       - name: Run unit tests
+        env:
+          LLM_LAMBDA_ARN: ${{ env.LLM_LAMBDA_ARN }}
         run: |
-          export LLM_LAMBDA_ARN=${{ env.LLM_LAMBDA_ARN }}
           pytest -m unit

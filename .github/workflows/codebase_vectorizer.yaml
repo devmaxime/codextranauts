@@ -47,6 +47,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: "us-east-1"
+          CODEBASE_VECTORIZER_LAMBDA_ARN: ${{ env.CODEBASE_VECTORIZER_LAMBDA_ARN }}
         run: |
           echo '{"name":"${{ github.event.inputs.name }}", "repo":"${{ github.event.inputs.repo }}"}' > payload.json
           aws lambda invoke --function-name ${{ env.CODEBASE_VECTORIZER_LAMBDA_ARN }} --payload file://payload.json response.json
