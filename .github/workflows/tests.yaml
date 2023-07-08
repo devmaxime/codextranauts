@@ -1,4 +1,4 @@
-name: Python application test
+name: Python tests
 
 on: [push, pull_request]
 
