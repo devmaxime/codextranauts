@@ -11,13 +11,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Get env vars
-LLM_LAMBDA_ARN = os.getenv('LLM_LAMBDA_ARN')
+LLM_LAMBDA_ARN = os.getenv("LLM_LAMBDA_ARN")
 
 if not LLM_LAMBDA_ARN:
     raise ValueError("Missing environment variable: LLM_LAMBDA_ARN")
 
 
-lambda_client = boto3.client('lambda')
+lambda_client = boto3.client("lambda")
 
 
 def error_handler(func):
@@ -36,6 +36,7 @@ def error_handler(func):
                 "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
                 "body": json.dumps({"error": str(err)}),
             }
+
     return wrapper
 
 
@@ -60,14 +61,14 @@ def make_llm_request(params):
     try:
         invoke_response = lambda_client.invoke(
             FunctionName=LLM_LAMBDA_ARN,
-            InvocationType='RequestResponse',
-            Payload=json.dumps(params)
+            InvocationType="RequestResponse",
+            Payload=json.dumps(params),
         )
     except (BotoCoreError, ClientError) as error:
         logger.error(f"Error calling Lambda function: {str(error)}")
         raise error
 
-    payload = json.loads(invoke_response['Payload'].read().decode('utf-8'))
+    payload = json.loads(invoke_response["Payload"].read().decode("utf-8"))
     return payload
 
 
@@ -76,7 +77,4 @@ def lambda_handler(event, context):
     query = validate_event(event)
     params = {"question": query}
     response_text = make_llm_request(params)
-    return {
-        "statusCode": HTTPStatus.OK,
-        "body": json.dumps({"code": response_text})
-    }
+    return {"statusCode": HTTPStatus.OK, "body": json.dumps({"code": response_text})}
