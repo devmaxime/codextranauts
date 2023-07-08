@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Specification template describing Codebase Vectorizer lambda.
+
+Resources:
+  # Lambdas
+  CodebaseVectoriserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambdas/codebase_vectorizer_lambda/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+Outputs:
+  CodebaseVectoriserFunctionArn:
+    Description: Codebase Vectorizer Function ARN
+    Value: !GetAtt CodebaseVectoriserFunction.Arn

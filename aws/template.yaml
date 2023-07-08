@@ -107,6 +107,12 @@ Resources:
     Properties:
       Location: ./llm/template.yaml
 
+  # Codebase Vectorizer stacks
+  CodebaseVectorizerStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./codebase_vectorizer/template.yaml
+
   # API stacks
   ApiV1Stack:
     Type: AWS::Serverless::Application
