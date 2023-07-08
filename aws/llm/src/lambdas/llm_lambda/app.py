@@ -1,3 +1,3 @@
 def lambda_handler(event, context):
-    print("Event:", event)
-    return "Some code context"
+    result = "some code context"
+    return result
