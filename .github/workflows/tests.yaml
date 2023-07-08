@@ -1,0 +1,24 @@
+name: Python application test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Aggregate requirements and install dependencies
+        run: |
+          chmod +x aggregate_requirements.sh
+          ./aggregate_requirements.sh
+
+      - name: Test with pytest
+        run: |
+          pytest
