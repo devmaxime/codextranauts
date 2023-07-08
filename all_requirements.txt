@@ -1,0 +1,15 @@
+
+boto3
+deeplake
+fastapi
+langchain
+moto
+openai
+openapi_spec_validator
+pinecone-client
+pytest
+python-dotenv
+requests
+requests_mock
+tiktoken 
+uvicorn
