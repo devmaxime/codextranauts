@@ -35,8 +35,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r all_requirements.txt
 
-      # - name: Test with pytest
+      # - name: Run unit tests
       #   env:
       #     LLM_LAMBDA_ARN: ${{ secrets.LLM_LAMBDA_ARN }}
       #   run: |
-      #     pytest
+      #     pytest -m unit
