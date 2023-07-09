@@ -3,26 +3,41 @@ import subprocess
 import json
 
 # Load the SAM configuration file
-config = toml.load("aws/samconfig.toml")
+config_path = "./aws/samconfig.toml"
+
+try:
+    # Load the SAM configuration file
+    config = toml.load(config_path)
+except Exception:
+    print("ERROR: couldn't load toml file.")
 
 # Get the stack name from the configuration file
-stack_name = config["default"]["deploy"]["parameters"]["stack_name"]
+stack_name = (
+    config.get("default", {}).get("deploy", {}).get("parameters", {}).get("stack_name")
+)
+
+if not stack_name:
+    print("Stack name not found in the configuration file.")
 
 # Call the AWS CLI command with the extracted stack name
-output = subprocess.check_output(
-    [
-        "aws",
-        "cloudformation",
-        "describe-stacks",
-        "--stack-name",
-        stack_name,
-        "--query",
-        "Stacks[0].Outputs",
-        "--output",
-        "json",
-    ]
-)
-outputs = json.loads(output)
+try:
+    output = subprocess.check_output(
+        [
+            "aws",
+            "cloudformation",
+            "describe-stacks",
+            "--stack-name",
+            stack_name,
+            "--query",
+            "Stacks[0].Outputs",
+            "--output",
+            "json",
+        ]
+    )
+    outputs = json.loads(output)
+except Exception as e:
+    print(f"Error while parsing stack outputs: {e}")
+
 
 # Now you can use the 'outputs' dictionary in your script
 llm_lambda_output = None
