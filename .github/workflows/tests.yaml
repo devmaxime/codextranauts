@@ -24,23 +24,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # - name: Aggregate requirements and install dependencies
-      #   run: |
-      #     chmod +x aggregate_requirements.sh
-      #     ./aggregate_requirements.sh
+      - name: Aggregate requirements and install dependencies
+        run: |
+          chmod +x aggregate_requirements.sh
+          ./aggregate_requirements.sh
 
-      # - name: Cache dependencies
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/all_requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/all_requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-      # - name: Install dependencies
-      #   run: |
-      #     python -m pip install --upgrade pip
-      #     pip install -r all_requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r all_requirements.txt
 
       - name: Extract stack outputs for lambda ARNs
         run: |
@@ -49,14 +49,9 @@ jobs:
           echo LLM_LAMBDA_ARN=$(awk '{print $1}' temp.txt) >> $GITHUB_ENV
           echo CODEBASE_VECTORIZER_LAMBDA_ARN=$(awk '{print $2}' temp.txt) >> $GITHUB_ENV
 
-      - name: Check env vars
+      - name: Run unit tests
         env:
           LLM_LAMBDA_ARN: ${{ env.LLM_LAMBDA_ARN }}
+          CODEBASE_VECTORIZER_LAMBDA_ARN: ${{ env.CODEBASE_VECTORIZER_LAMBDA_ARN }}
         run: |
-          echo $LLM_LAMBDA_ARN
-
-      # - name: Run unit tests
-      #   env:
-      #     LLM_LAMBDA_ARN: ${{ env.LLM_LAMBDA_ARN }}
-      #   run: |
-      #     pytest -m unit
+          pytest -m unit
