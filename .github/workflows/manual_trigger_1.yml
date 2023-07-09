@@ -1,19 +1,17 @@
 name: Invoke Lambda Function
 
 on:
+  push:
   workflow_dispatch:
-
     inputs:
       url:
         description: Codebase Url
-        default: 'https://github.com/devmaxime/vectornauts/blob/main/README.md'
+        default: "https://github.com/devmaxime/vectornauts/blob/main/README.md"
         required: true
         type: string
 
-
 jobs:
-   invoke-lambda:
-
+  invoke-lambda:
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
