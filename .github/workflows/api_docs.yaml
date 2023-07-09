@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Checkout Swagger UI
         uses: actions/checkout@v2
         with:
@@ -43,24 +46,24 @@ jobs:
           echo $(python ./utils/ci/extract_stack_outputs.py) > temp.txt
           echo DOC_BUCKET_NAME=$(awk '{print $3}' temp.txt) >> $GITHUB_ENV
 
-      # - name: Upload to S3
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_REGION: "us-west-2" # Change to your AWS region
-      #     DOC_BUCKET_NAME: ${{ env.DOC_BUCKET_NAME }}
-      #   run: |
-      #     python - <<EOF
-      #     import boto3
-      #     import os
+      - name: Upload to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "us-west-2" # Change to your AWS region
+          DOC_BUCKET_NAME: ${{ env.DOC_BUCKET_NAME }}
+        run: |
+          python - <<EOF
+          import boto3
+          import os
 
-      #     s3 = boto3.client('s3')
-      #     bucket_name = '${{ env.DOC_BUCKET_NAME }}'
+          s3 = boto3.client('s3')
+          bucket_name = '${{ env.DOC_BUCKET_NAME }}'
 
-      #     for file in os.listdir('swagger-ui/dist'):
-      #         if os.path.isfile(f'swagger-ui/dist/{file}'):
-      #             s3.upload_file(f'swagger-ui/dist/{file}', bucket_name, file)
-      #     EOF
+          for file in os.listdir('swagger-ui/dist'):
+              if os.path.isfile(f'swagger-ui/dist/{file}'):
+                  s3.upload_file(f'swagger-ui/dist/{file}', bucket_name, file)
+          EOF
 
   update_yaml:
     needs: setup_swagger_ui
