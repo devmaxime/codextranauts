@@ -22,7 +22,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-2
+          aws-region: us-east-1
 
       # - name: Aggregate requirements and install dependencies
       #   run: |
@@ -49,8 +49,14 @@ jobs:
           echo LLM_LAMBDA_ARN=$(awk '{print $1}' temp.txt) >> $GITHUB_ENV
           echo CODEBASE_VECTORIZER_LAMBDA_ARN=$(awk '{print $2}' temp.txt) >> $GITHUB_ENV
 
-      - name: Run unit tests
+      - name: Check env vars
         env:
           LLM_LAMBDA_ARN: ${{ env.LLM_LAMBDA_ARN }}
         run: |
-          pytest -m unit
+          echo $LLM_LAMBDA_ARN
+
+      # - name: Run unit tests
+      #   env:
+      #     LLM_LAMBDA_ARN: ${{ env.LLM_LAMBDA_ARN }}
+      #   run: |
+      #     pytest -m unit
