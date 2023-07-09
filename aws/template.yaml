@@ -137,3 +137,6 @@ Outputs:
   CodebaseVectorizerLambdaOutput:
     Description: Codebase Vectorizer lambda arn
     Value: !GetAtt CodebaseVectorizerStack.Outputs.CodebaseVectorizerFunctionArn
+  DocsBucketNameOutput:
+    Description: API Docs S3 bucket
+    Value: !Ref DocsBucket

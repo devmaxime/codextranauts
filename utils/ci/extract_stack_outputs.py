@@ -42,10 +42,17 @@ except Exception as e:
 # Now you can use the 'outputs' dictionary in your script
 llm_lambda_output = None
 codebase_vectorizer_lambda_output = None
+docs_bucket_name_output = None
 for output in outputs:
     if output["OutputKey"] == "LlmLambdaOutput":
         llm_lambda_output = output["OutputValue"]
     elif output["OutputKey"] == "CodebaseVectorizerLambdaOutput":
         codebase_vectorizer_lambda_output = output["OutputValue"]
+    elif output["OutputKey"] == "DocsBucketNameOutput":
+        docs_bucket_name_output = output["OutputValue"]
 
-print(llm_lambda_output, codebase_vectorizer_lambda_output)
+print(
+    llm_lambda_output,
+    codebase_vectorizer_lambda_output,
+    docs_bucket_name_output,
+)

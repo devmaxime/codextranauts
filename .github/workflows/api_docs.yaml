@@ -1,0 +1,35 @@
+name: Upload API docs into S3
+
+on:
+  push:
+    # branches:
+    #   - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Extract Docs S3 Bucket name
+        run: |
+          pip install toml
+          echo $(python ./utils/ci/extract_stack_outputs.py) > temp.txt
+          echo LLM_LAMBDA_ARN=$(awk '{print $1}' temp.txt) >> $GITHUB_ENV
+          echo CODEBASE_VECTORIZER_LAMBDA_ARN=$(awk '{print $2}' temp.txt) >> $GITHUB_ENV
+          echo DOC_BUCKET_NAME=$(awk '{print $3}' temp.txt) >> $GITHUB_ENV
+
+      - name: Update API specs file in S3
+        env:
+          DOC_BUCKET_NAME: ${{ env.DOC_BUCKET_NAME }}
+        run: |
+          aws s3 cp ./aws/api/v1/api-spec/bundled.yaml s3://${{ env.DOC_BUCKET_NAME }}/

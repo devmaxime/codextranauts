@@ -48,6 +48,7 @@ jobs:
           echo $(python ./utils/ci/extract_stack_outputs.py) > temp.txt
           echo LLM_LAMBDA_ARN=$(awk '{print $1}' temp.txt) >> $GITHUB_ENV
           echo CODEBASE_VECTORIZER_LAMBDA_ARN=$(awk '{print $2}' temp.txt) >> $GITHUB_ENV
+          echo DOC_BUCKET_NAME=$(awk '{print $3}' temp.txt) >> $GITHUB_ENV
 
       - name: Run unit tests
         env:
