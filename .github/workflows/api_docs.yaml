@@ -50,7 +50,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: "us-west-2" # Change to your AWS region
+          AWS_REGION: "us-east-1"
           DOC_BUCKET_NAME: ${{ env.DOC_BUCKET_NAME }}
         run: |
           python - <<EOF
@@ -59,10 +59,19 @@ jobs:
 
           s3 = boto3.client('s3')
           bucket_name = '${{ env.DOC_BUCKET_NAME }}'
+          mime_types = {
+              '.html': 'text/html',
+              '.css': 'text/css',
+              '.js': 'application/javascript',
+              '.yaml': 'application/x-yaml'
+          }
 
           for file in os.listdir('swagger-ui/dist'):
               if os.path.isfile(f'swagger-ui/dist/{file}'):
-                  s3.upload_file(f'swagger-ui/dist/{file}', bucket_name, file)
+                  file_extension = os.path.splitext(file)[1]
+                  content_type = mime_types.get(file_extension)
+                  extra_args = {'ContentType': content_type} if content_type else None
+                  s3.upload_file(f'swagger-ui/dist/{file}', bucket_name, file, ExtraArgs=extra_args)
           EOF
 
   update_yaml:
@@ -90,4 +99,28 @@ jobs:
         env:
           DOC_BUCKET_NAME: ${{ env.DOC_BUCKET_NAME }}
         run: |
-          aws s3 cp ./aws/api/v1/api-spec/bundled.yaml s3://${{ env.DOC_BUCKET_NAME }}/
+          aws s3 cp ./aws/api/v1/api-spec/bundled.yaml s3://${{ env.DOC_BUCKET_NAME }}/ --content-type application/x-yaml
+
+  invalidate_cloudfront_cache:
+    needs: update_yaml
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Extract Docs CloudFront Distribution Id
+        run: |
+          pip install toml
+          echo $(python ./utils/ci/extract_stack_outputs.py) > temp.txt
+          echo DOCS_CLOUDFRONT_DISTRIBUTION_ID=$(awk '{print $4}' temp.txt) >> $GITHUB_ENV
+
+      - name: Invalidate CloudFront distribution
+        env:
+          DOCS_CLOUDFRONT_DISTRIBUTION_ID: ${{ env.DOCS_CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ env.DOC_BUCKET_NAME }} --paths "/*"

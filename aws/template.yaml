@@ -135,7 +135,7 @@ Outputs:
   ApiDomainOutput:
     Description: Custom API domain name
     Value: !Ref ApiDomain
-  CloudFrontDistributionOutput:
+  DocsCloudFrontDistributionOutput:
     Description: CloudFront endpoint to add in DNS CNAME record (CNAME  docs  <cloud_front_id>  default)
     Value: !GetAtt DocsCloudFrontDistribution.DomainName
   LlmLambdaOutput:
