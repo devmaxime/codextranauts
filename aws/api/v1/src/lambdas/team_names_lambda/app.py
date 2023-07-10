@@ -54,6 +54,11 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
         return {
             "statusCode": STATUS_CODE_OK,
+            "headers": {
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Origin": "https://docs.bluecollarverse.co.uk",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+            },
             "body": json.dumps(team_data),
         }
     except Exception as e:

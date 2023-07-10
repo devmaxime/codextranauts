@@ -77,4 +77,12 @@ def lambda_handler(event, context):
     query = validate_event(event)
     params = {"question": query}
     response_text = make_llm_request(params)
-    return {"statusCode": HTTPStatus.OK, "body": json.dumps({"code": response_text})}
+    return {
+        "statusCode": HTTPStatus.OK,
+        "headers": {
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Origin": "https://docs.bluecollarverse.co.uk",
+            "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+        },
+        "body": json.dumps({"code": response_text}),
+    }
