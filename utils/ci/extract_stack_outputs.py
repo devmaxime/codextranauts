@@ -43,6 +43,7 @@ except Exception as e:
 llm_lambda_output = None
 codebase_vectorizer_lambda_output = None
 docs_bucket_name_output = None
+docs_cloudfront_distribution_id_output = None
 for output in outputs:
     if output["OutputKey"] == "LlmLambdaOutput":
         llm_lambda_output = output["OutputValue"]
