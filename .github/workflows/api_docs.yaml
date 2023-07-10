@@ -126,4 +126,4 @@ jobs:
         env:
           DOCS_CLOUDFRONT_DISTRIBUTION_ID: ${{ env.DOCS_CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ env.DOC_BUCKET_NAME }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ env.DOCS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
