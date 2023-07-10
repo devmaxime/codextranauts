@@ -138,6 +138,9 @@ Outputs:
   DocsCloudFrontDistributionOutput:
     Description: CloudFront endpoint to add in DNS CNAME record (CNAME  docs  <cloud_front_id>  default)
     Value: !GetAtt DocsCloudFrontDistribution.DomainName
+  DocsCloudFrontDistributionIdOutput:
+    Description: Docs CloudFront Distribution ID
+    Value: !Ref DocsCloudFrontDistribution
   LlmLambdaOutput:
     Description: LLM lambda arn
     Value: !GetAtt LlmStack.Outputs.LlmFunctionArn

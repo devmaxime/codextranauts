@@ -51,7 +51,7 @@ for output in outputs:
         codebase_vectorizer_lambda_output = output["OutputValue"]
     elif output["OutputKey"] == "DocsBucketNameOutput":
         docs_bucket_name_output = output["OutputValue"]
-    elif output["OutputKey"] == "DocsCloudFrontDistributionOutput":
+    elif output["OutputKey"] == "DocsCloudFrontDistributionIdOutput":
         docs_cloudfront_distribution_id_output = output["OutputValue"]
 
 print(
