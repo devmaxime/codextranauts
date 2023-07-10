@@ -27,36 +27,36 @@ paths:
           required: true
           description: The user's query.
       responses:
-        '200':
+        "200":
           description: Code context retrieved successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/codeResponse'
-        '400':
+                $ref: "#/components/schemas/codeResponse"
+        "400":
           description: Bad Request, usually due to invalid event data.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-        '500':
+                $ref: "#/components/schemas/error"
+        "500":
           description: An unexpected error occurred.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-        '503':
+                $ref: "#/components/schemas/error"
+        "503":
           description: External service unavailable or request rejected.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-        '504':
+                $ref: "#/components/schemas/error"
+        "504":
           description: Request to external service timed out.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
       x-amazon-apigateway-integration:
         httpMethod: POST
         type: aws_proxy
@@ -73,30 +73,30 @@ paths:
         This endpoint retrieves the team's data. It returns a JSON object that
         contains the team's details.
       responses:
-        '200':
+        "200":
           description: Team data retrieved successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/teamData'
-        '400':
+                $ref: "#/components/schemas/teamData"
+        "400":
           description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-        '500':
+                $ref: "#/components/schemas/error"
+        "500":
           description: An unexpected error occurred.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
-        '503':
+                $ref: "#/components/schemas/error"
+        "503":
           description: Team data not available.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: "#/components/schemas/error"
       x-amazon-apigateway-integration:
         httpMethod: POST
         type: aws_proxy
@@ -118,7 +118,7 @@ components:
             The code context string returned by the external service. This
             string contains the relevant code snippet or reference related to
             the user's query.
-          example: 'def hello_world(): print(''Hello, World!'')'
+          example: "def hello_world(): print('Hello, World!')"
       required:
         - code
     error:
@@ -179,7 +179,7 @@ components:
           description: List of team members
           minItems: 1
           items:
-            $ref: '#/components/schemas/teamMember'
+            $ref: "#/components/schemas/teamMember"
           example:
             - github: johnDoe123
               first_name: John
