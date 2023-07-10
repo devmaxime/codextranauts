@@ -1,5 +1,5 @@
+title: Code Response
 type: object
-title: CodeResponse
 description: "An object containing the code context returned by the external service. This code context is a response to the user's query."
 properties:
   code:

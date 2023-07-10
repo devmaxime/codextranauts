@@ -1,3 +1,4 @@
+title: Error
 type: object
 description: Object representing an error.
 required:

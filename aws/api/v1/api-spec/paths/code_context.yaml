@@ -1,6 +1,6 @@
 get:
   tags:
-    - code context
+    - Code Context
   summary: Fetches code context based on the query
   description: Returns a code context based on the user's query. If there's an error in the query or while interacting with the external service, it returns an error object.
   operationId: getCodeContext

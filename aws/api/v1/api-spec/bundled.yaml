@@ -12,7 +12,7 @@ paths:
   /code_context:
     get:
       tags:
-        - code context
+        - Code Context
       summary: Fetches code context based on the query
       description: >-
         Returns a code context based on the user's query. If there's an error in
@@ -106,8 +106,8 @@ paths:
 components:
   schemas:
     codeResponse:
+      title: Code Response
       type: object
-      title: CodeResponse
       description: >-
         An object containing the code context returned by the external service.
         This code context is a response to the user's query.
@@ -122,6 +122,7 @@ components:
       required:
         - code
     error:
+      title: Error
       type: object
       description: Object representing an error.
       required:
@@ -160,6 +161,7 @@ components:
           maxLength: 50
           example: Andrey
     teamData:
+      title: Team Data
       type: object
       description: The team object
       required:

@@ -62,6 +62,11 @@ Resources:
             Resource: !Sub "arn:aws:s3:::${DocsBucket}/*"
             Principal:
               CanonicalUser: !GetAtt DocsCloudFrontDistributionIdentity.S3CanonicalUserId
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub "arn:aws:s3:::${DocsBucket}/*"
+            Principal: "*"
+            Sid: PublicReadGetObject
 
   # CloudFront distributions
   DocsCloudFrontDistributionIdentity:
@@ -100,6 +105,8 @@ Resources:
         ViewerCertificate:
           AcmCertificateArn: !Ref DocsCertificate
           SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+        HttpVersion: http2
 
   # LLM stacks
   LlmStack:
@@ -129,7 +136,7 @@ Outputs:
     Description: Custom API domain name
     Value: !Ref ApiDomain
   CloudFrontDistributionOutput:
-    Description: CloudFront endpoint to add in DNS CNAME record
+    Description: CloudFront endpoint to add in DNS CNAME record (CNAME  docs  <cloud_front_id>  default)
     Value: !GetAtt DocsCloudFrontDistribution.DomainName
   LlmLambdaOutput:
     Description: LLM lambda arn
