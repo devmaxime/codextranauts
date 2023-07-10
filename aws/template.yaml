@@ -128,6 +128,7 @@ Resources:
     Properties:
       Location: ./api/v1/template.yaml
       Parameters:
+        DocsDomainName: !Ref DocsDomainName
         ApiDomain: !Ref ApiDomain
         LlmFunctionArn: !GetAtt LlmStack.Outputs.LlmFunctionArn
 

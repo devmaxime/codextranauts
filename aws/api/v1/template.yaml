@@ -3,9 +3,12 @@ Transform: AWS::Serverless-2016-10-31
 Description: An API Gateway with a custom domain.
 
 Parameters:
+  DocsDomainName:
+    Type: String
+    Description: Docs custom domain name
   ApiDomain:
     Type: String
-    Description: The custom domain name
+    Description: API custom domain name
   LlmFunctionArn:
     Type: String
     Description: The ARN of the LLM function
@@ -55,6 +58,7 @@ Resources:
       Runtime: python3.9
       Environment:
         Variables:
+          DOCS_DOMAIN_NAME: !Ref DocsDomainName
           LLM_LAMBDA_ARN: !Ref LlmFunctionArn
       Events:
         HelloWorld:
@@ -79,6 +83,9 @@ Resources:
       CodeUri: src/lambdas/team_names_lambda/
       Handler: app.lambda_handler
       Runtime: python3.9
+      Environment:
+        Variables:
+          DOCS_DOMAIN_NAME: !Ref DocsDomainName
       Events:
         ByeWorld:
           Type: Api

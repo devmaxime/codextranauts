@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Get env vars
+DOCS_DOMAIN_NAME = os.getenv("DOCS_DOMAIN_NAME")
 LLM_LAMBDA_ARN = os.getenv("LLM_LAMBDA_ARN")
 
 if not LLM_LAMBDA_ARN:
@@ -81,7 +82,7 @@ def lambda_handler(event, context):
         "statusCode": HTTPStatus.OK,
         "headers": {
             "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Origin": "https://docs.bluecollarverse.co.uk",
+            "Access-Control-Allow-Origin": f"https://{DOCS_DOMAIN_NAME}",
             "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
         },
         "body": json.dumps({"code": response_text}),

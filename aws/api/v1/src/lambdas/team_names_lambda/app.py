@@ -7,6 +7,8 @@ from json import JSONDecodeError
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
+# Get env vars
+DOCS_DOMAIN_NAME = os.getenv("DOCS_DOMAIN_NAME")
 
 # Constants
 STATUS_CODE_OK = 200
@@ -56,7 +58,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             "statusCode": STATUS_CODE_OK,
             "headers": {
                 "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Origin": "https://docs.bluecollarverse.co.uk",
+                "Access-Control-Allow-Origin": f"https://{DOCS_DOMAIN_NAME}",
                 "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
             },
             "body": json.dumps(team_data),
